@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.5 (Debian 17.5-1.pgdg120+1)
+-- Dumped from database version 10.23 (Ubuntu 10.23-7.pgdg20.04+1)
 -- Dumped by pg_dump version 17.5 (Ubuntu 17.5-1.pgdg20.04+1)
 
 SET statement_timeout = 0;
@@ -27,8 +27,6 @@ SET row_security = off;
 ALTER SCHEMA public OWNER TO postgres;
 
 SET default_tablespace = '';
-
-SET default_table_access_method = heap;
 
 --
 -- Name: accounting; Type: TABLE; Schema: public; Owner: postgres
@@ -59,56 +57,302 @@ CREATE TABLE public.accounting (
 ALTER TABLE public.accounting OWNER TO postgres;
 
 --
--- Name: hotspot_accounting_test; Type: TABLE; Schema: public; Owner: postgres
+-- Name: accounting_test; Type: TABLE; Schema: public; Owner: radiator
 --
 
-CREATE TABLE public.hotspot_accounting_test (
-    session_id character varying(128) NOT NULL,
-    user_name character varying(64),
-    calling_station_id character varying(64),
-    nas_ip_address inet,
-    nas_port integer,
-    acct_session_id character varying(64),
-    start_time timestamp without time zone,
-    stop_time timestamp without time zone,
-    input_octets bigint,
-    output_octets bigint,
-    session_time interval,
-    acct_status_type character varying(32),
-    service_name character varying(64)
+CREATE TABLE public.accounting_test (
+    calling_station_id character varying(255) NOT NULL,
+    acctdelaytime bigint,
+    acctinputoctets bigint,
+    acctoutputoctets bigint,
+    acctsessionid character varying(255),
+    acctsessiontime bigint,
+    acctstatustype character varying(255),
+    acctterminatecause character varying(255),
+    auth_mode character varying(255),
+    called_station_id character varying(255),
+    created_at timestamp with time zone,
+    device character varying(255),
+    framedipaddress character varying(255),
+    mac character varying(255),
+    nasidentifier character varying(255),
+    nasport bigint,
+    time_stamp bigint,
+    username character varying(255)
 );
 
 
-ALTER TABLE public.hotspot_accounting_test OWNER TO postgres;
+ALTER TABLE public.accounting_test OWNER TO radiator;
 
 --
--- Name: hotspot_test_services; Type: TABLE; Schema: public; Owner: postgres
+-- Name: allowed_nas_mac_address; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.hotspot_test_services (
-    name character varying(32) NOT NULL,
-    price integer NOT NULL,
-    prepaidtime interval NOT NULL,
-    prepaidquota bigint NOT NULL,
-    replyitems text,
-    prepaiduprate character varying(16),
-    prepaiddownrate character varying(16)
+CREATE TABLE public.allowed_nas_mac_address (
+    id integer NOT NULL,
+    called_station_id text NOT NULL,
+    updated_at timestamp without time zone DEFAULT now()
 );
 
 
-ALTER TABLE public.hotspot_test_services OWNER TO postgres;
+ALTER TABLE public.allowed_nas_mac_address OWNER TO postgres;
 
 --
--- Name: hotspot_test_subcribers; Type: TABLE; Schema: public; Owner: postgres
+-- Name: allowed_nas_mac_address_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.hotspot_test_subcribers (
-    username character varying(64) NOT NULL,
-    password character varying(64) NOT NULL
+CREATE SEQUENCE public.allowed_nas_mac_address_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.allowed_nas_mac_address_id_seq OWNER TO postgres;
+
+--
+-- Name: allowed_nas_mac_address_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.allowed_nas_mac_address_id_seq OWNED BY public.allowed_nas_mac_address.id;
+
+
+--
+-- Name: called_station_log; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.called_station_log (
+    id integer NOT NULL,
+    username text,
+    called_station_id text,
+    nas_ip text,
+    "timestamp" timestamp without time zone DEFAULT CURRENT_TIMESTAMP
 );
 
 
-ALTER TABLE public.hotspot_test_subcribers OWNER TO postgres;
+ALTER TABLE public.called_station_log OWNER TO postgres;
+
+--
+-- Name: called_station_log_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.called_station_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.called_station_log_id_seq OWNER TO postgres;
+
+--
+-- Name: called_station_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.called_station_log_id_seq OWNED BY public.called_station_log.id;
+
+
+--
+-- Name: namespace_cpu_quota_daily; Type: TABLE; Schema: public; Owner: radiator
+--
+
+CREATE TABLE public.namespace_cpu_quota_daily (
+    id integer NOT NULL,
+    namespace text NOT NULL,
+    cpu_limit double precision NOT NULL,
+    collected_at date NOT NULL
+);
+
+
+ALTER TABLE public.namespace_cpu_quota_daily OWNER TO radiator;
+
+--
+-- Name: namespace_cpu_quota_daily_id_seq; Type: SEQUENCE; Schema: public; Owner: radiator
+--
+
+CREATE SEQUENCE public.namespace_cpu_quota_daily_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.namespace_cpu_quota_daily_id_seq OWNER TO radiator;
+
+--
+-- Name: namespace_cpu_quota_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: radiator
+--
+
+ALTER SEQUENCE public.namespace_cpu_quota_daily_id_seq OWNED BY public.namespace_cpu_quota_daily.id;
+
+
+--
+-- Name: namespace_memory_quota_daily; Type: TABLE; Schema: public; Owner: radiator
+--
+
+CREATE TABLE public.namespace_memory_quota_daily (
+    id integer NOT NULL,
+    namespace text NOT NULL,
+    memory_limit double precision NOT NULL,
+    collected_at date NOT NULL
+);
+
+
+ALTER TABLE public.namespace_memory_quota_daily OWNER TO radiator;
+
+--
+-- Name: namespace_memory_quota_daily_id_seq; Type: SEQUENCE; Schema: public; Owner: radiator
+--
+
+CREATE SEQUENCE public.namespace_memory_quota_daily_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.namespace_memory_quota_daily_id_seq OWNER TO radiator;
+
+--
+-- Name: namespace_memory_quota_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: radiator
+--
+
+ALTER SEQUENCE public.namespace_memory_quota_daily_id_seq OWNED BY public.namespace_memory_quota_daily.id;
+
+
+--
+-- Name: nas_session_mac_attrs; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.nas_session_mac_attrs (
+    username text NOT NULL,
+    called_station_id text,
+    updated_at timestamp without time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.nas_session_mac_attrs OWNER TO postgres;
+
+--
+-- Name: pod_resource_usage_limits; Type: TABLE; Schema: public; Owner: radiator
+--
+
+CREATE TABLE public.pod_resource_usage_limits (
+    id integer NOT NULL,
+    namespace text NOT NULL,
+    pod text NOT NULL,
+    resource text NOT NULL,
+    value double precision NOT NULL,
+    collected_at date NOT NULL
+);
+
+
+ALTER TABLE public.pod_resource_usage_limits OWNER TO radiator;
+
+--
+-- Name: pod_resource_usage_limits_id_seq; Type: SEQUENCE; Schema: public; Owner: radiator
+--
+
+CREATE SEQUENCE public.pod_resource_usage_limits_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.pod_resource_usage_limits_id_seq OWNER TO radiator;
+
+--
+-- Name: pod_resource_usage_limits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: radiator
+--
+
+ALTER SEQUENCE public.pod_resource_usage_limits_id_seq OWNED BY public.pod_resource_usage_limits.id;
+
+
+--
+-- Name: pod_resource_usage_requests; Type: TABLE; Schema: public; Owner: radiator
+--
+
+CREATE TABLE public.pod_resource_usage_requests (
+    id integer NOT NULL,
+    namespace text NOT NULL,
+    pod text NOT NULL,
+    resource text NOT NULL,
+    value double precision NOT NULL,
+    collected_at date NOT NULL
+);
+
+
+ALTER TABLE public.pod_resource_usage_requests OWNER TO radiator;
+
+--
+-- Name: pod_resource_usage_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: radiator
+--
+
+CREATE SEQUENCE public.pod_resource_usage_requests_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.pod_resource_usage_requests_id_seq OWNER TO radiator;
+
+--
+-- Name: pod_resource_usage_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: radiator
+--
+
+ALTER SEQUENCE public.pod_resource_usage_requests_id_seq OWNED BY public.pod_resource_usage_requests.id;
+
+
+--
+-- Name: pvc_storage_requests; Type: TABLE; Schema: public; Owner: radiator
+--
+
+CREATE TABLE public.pvc_storage_requests (
+    id integer NOT NULL,
+    namespace text,
+    persistentvolumeclaim text,
+    value bigint,
+    collected_at timestamp with time zone
+);
+
+
+ALTER TABLE public.pvc_storage_requests OWNER TO radiator;
+
+--
+-- Name: pvc_storage_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: radiator
+--
+
+CREATE SEQUENCE public.pvc_storage_requests_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.pvc_storage_requests_id_seq OWNER TO radiator;
+
+--
+-- Name: pvc_storage_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: radiator
+--
+
+ALTER SEQUENCE public.pvc_storage_requests_id_seq OWNED BY public.pvc_storage_requests.id;
+
 
 --
 -- Name: radacct; Type: TABLE; Schema: public; Owner: postgres
@@ -227,7 +471,8 @@ CREATE TABLE public.radclientlist (
     framedgroupmaxportsperclassc integer,
     rewriteusername character varying(50),
     noignoreduplicates character varying(50),
-    prehandlerhook character varying(50)
+    prehandlerhook character varying(50),
+    identifier character varying
 );
 
 
@@ -353,6 +598,21 @@ CREATE TABLE public.radstatslog (
 ALTER TABLE public.radstatslog OWNER TO postgres;
 
 --
+-- Name: sessions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.sessions (
+    username text NOT NULL,
+    nasipaddress text NOT NULL,
+    nasport integer,
+    acctsessionid text NOT NULL,
+    acctstarttime timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.sessions OWNER TO postgres;
+
+--
 -- Name: subscribers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -392,6 +652,55 @@ CREATE TABLE public.subscribers (
 
 
 ALTER TABLE public.subscribers OWNER TO radiator;
+
+--
+-- Name: allowed_nas_mac_address id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.allowed_nas_mac_address ALTER COLUMN id SET DEFAULT nextval('public.allowed_nas_mac_address_id_seq'::regclass);
+
+
+--
+-- Name: called_station_log id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.called_station_log ALTER COLUMN id SET DEFAULT nextval('public.called_station_log_id_seq'::regclass);
+
+
+--
+-- Name: namespace_cpu_quota_daily id; Type: DEFAULT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.namespace_cpu_quota_daily ALTER COLUMN id SET DEFAULT nextval('public.namespace_cpu_quota_daily_id_seq'::regclass);
+
+
+--
+-- Name: namespace_memory_quota_daily id; Type: DEFAULT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.namespace_memory_quota_daily ALTER COLUMN id SET DEFAULT nextval('public.namespace_memory_quota_daily_id_seq'::regclass);
+
+
+--
+-- Name: pod_resource_usage_limits id; Type: DEFAULT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.pod_resource_usage_limits ALTER COLUMN id SET DEFAULT nextval('public.pod_resource_usage_limits_id_seq'::regclass);
+
+
+--
+-- Name: pod_resource_usage_requests id; Type: DEFAULT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.pod_resource_usage_requests ALTER COLUMN id SET DEFAULT nextval('public.pod_resource_usage_requests_id_seq'::regclass);
+
+
+--
+-- Name: pvc_storage_requests id; Type: DEFAULT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.pvc_storage_requests ALTER COLUMN id SET DEFAULT nextval('public.pvc_storage_requests_id_seq'::regclass);
+
 
 --
 -- Name: radacct radacctid; Type: DEFAULT; Schema: public; Owner: postgres
@@ -652,36 +961,2574 @@ testuser	1748316908	Stop	\N	0	0	\N	61	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	0074
 testuser	1748317010	Start	\N	\N	\N	\N	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
 testuser	1748317464	Stop	\N	176584	1589118	\N	454	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
 testuser	1748317704	Start	\N	\N	\N	\N	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
-limit	1749031180	Start	\N	\N	\N	00749c64ae6c_000_0000000081_0000190822	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748395263	Start	\N	\N	\N	\N	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748395322	Alive	\N	42880	60044	\N	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748395383	Alive	\N	44401	63565	\N	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748395443	Alive	\N	49694	67474	\N	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748395503	Alive	\N	56464	70093	\N	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748395563	Alive	\N	80695	118690	\N	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748395623	Alive	\N	84338	121679	\N	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748395682	Alive	\N	111398	171764	\N	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748395742	Alive	\N	140832	180844	\N	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748395802	Alive	\N	214814	508017	\N	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748395862	Alive	\N	216452	509410	\N	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748395923	Alive	\N	273310	638251	\N	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748395983	Alive	\N	283467	646242	\N	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748396043	Alive	\N	284887	648514	\N	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748396077	Stop	\N	284887	648514	\N	814	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748396311	Start	\N	\N	\N	\N	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748396371	Alive	\N	0	0	\N	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748396431	Alive	\N	104575	190312	\N	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748396491	Alive	\N	112790	205711	\N	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748396551	Alive	\N	117267	215053	\N	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748396610	Alive	\N	121642	224323	\N	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748396670	Alive	\N	182452	679699	\N	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748396730	Alive	\N	189814	686268	\N	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748396790	Alive	\N	191806	687811	\N	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748396851	Alive	\N	193946	689667	\N	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748396911	Alive	\N	215826	723643	\N	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748396971	Alive	\N	218436	727718	\N	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748397031	Alive	\N	228613	736252	\N	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748397091	Alive	\N	379593	819597	\N	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748397150	Alive	\N	380545	824358	\N	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748397210	Alive	\N	380545	824358	\N	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748397270	Alive	\N	380860	824931	\N	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748397331	Alive	\N	380860	824931	\N	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748397372	Stop	\N	381408	825756	\N	1061	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748397459	Start	\N	\N	\N	\N	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748397516	Stop	\N	0	0	\N	57	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748397569	Start	\N	\N	\N	\N	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748397629	Alive	\N	0	0	\N	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748397689	Alive	\N	76302	136090	\N	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748397749	Alive	\N	136228	215523	\N	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748397810	Alive	\N	157962	233499	\N	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748397870	Alive	\N	208569	311720	\N	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748397930	Alive	\N	265816	420484	\N	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748397990	Alive	\N	308414	453546	\N	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398050	Alive	\N	308414	453546	\N	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398110	Alive	\N	309124	455017	\N	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398169	Alive	\N	309700	458008	\N	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398229	Alive	\N	309971	458359	\N	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398289	Alive	\N	310324	458716	\N	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398349	Alive	\N	320156	464326	\N	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398410	Alive	\N	342462	482045	\N	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398470	Alive	\N	342462	482045	\N	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398530	Alive	\N	342623	482216	\N	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398590	Alive	\N	342924	482394	\N	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398650	Alive	\N	343056	482599	\N	1080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398709	Alive	\N	343217	482770	\N	1140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398769	Alive	\N	343217	482770	\N	1200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398829	Alive	\N	434483	590630	\N	1260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398889	Alive	\N	446458	606667	\N	1320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748398950	Alive	\N	453612	616649	\N	1380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399010	Alive	\N	453773	616820	\N	1440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399070	Alive	\N	463700	624669	\N	1500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399130	Alive	\N	493327	653825	\N	1560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399190	Alive	\N	520741	726537	\N	1620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399249	Alive	\N	531522	735820	\N	1680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399309	Alive	\N	531802	736096	\N	1740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399369	Alive	\N	551932	752470	\N	1800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399430	Alive	\N	552733	755808	\N	1860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399490	Alive	\N	553032	756052	\N	1920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399550	Alive	\N	553140	756312	\N	1980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399610	Alive	\N	553194	756417	\N	2040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399670	Alive	\N	553194	756417	\N	2100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399730	Alive	\N	559075	769497	\N	2160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399789	Alive	\N	591615	795611	\N	2220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399849	Alive	\N	677134	931359	\N	2280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399909	Alive	\N	1047082	9903818	\N	2340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748399969	Alive	\N	1048628	9909925	\N	2400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400030	Alive	\N	1049528	9912516	\N	2460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400090	Alive	\N	1070360	9938822	\N	2520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400150	Alive	\N	1185920	10168063	\N	2580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400210	Alive	\N	1249757	10453472	\N	2640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400270	Alive	\N	1250833	10461416	\N	2700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400329	Alive	\N	1251089	10461758	\N	2760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400389	Alive	\N	1258676	10469930	\N	2820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400449	Alive	\N	1258934	10471729	\N	2880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400509	Alive	\N	1258934	10471729	\N	2940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400570	Alive	\N	1259177	10472161	\N	3000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400630	Alive	\N	1259495	10473046	\N	3060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400690	Alive	\N	1259796	10473224	\N	3120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400750	Alive	\N	1259796	10473224	\N	3180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400810	Alive	\N	1259796	10473224	\N	3240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400869	Alive	\N	1359712	10508081	\N	3300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400929	Alive	\N	1539285	10672655	\N	3360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748400989	Alive	\N	1567606	10714532	\N	3420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401049	Alive	\N	1674729	10821313	\N	3480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401110	Alive	\N	1675578	10823318	\N	3540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401170	Alive	\N	1675739	10823489	\N	3600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401230	Alive	\N	1691254	10837663	\N	3660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401290	Alive	\N	1692622	10838789	\N	3720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401350	Alive	\N	1704088	10855860	\N	3780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401410	Alive	\N	1705061	10857753	\N	3840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401469	Alive	\N	1730683	10937444	\N	3900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401529	Alive	\N	1776858	10975583	\N	3960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401589	Alive	\N	1835984	11056183	\N	4020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401650	Alive	\N	1846305	11071269	\N	4080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401710	Alive	\N	1876989	11110731	\N	4140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401770	Alive	\N	1877097	11110941	\N	4200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401830	Alive	\N	1877594	11111767	\N	4260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401890	Alive	\N	1877895	11112011	\N	4320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748401949	Alive	\N	1877949	11112150	\N	4380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402009	Alive	\N	1878334	11112726	\N	4440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402069	Alive	\N	1878334	11112726	\N	4500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402129	Alive	\N	1878495	11112897	\N	4560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402190	Alive	\N	1879060	11113231	\N	4620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402250	Alive	\N	1883640	11119247	\N	4680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402310	Alive	\N	1883801	11119418	\N	4740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402370	Alive	\N	1883801	11119418	\N	4800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402430	Alive	\N	1951335	11194048	\N	4860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402489	Alive	\N	1952056	11194734	\N	4920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402549	Alive	\N	1952218	11195037	\N	4980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402609	Alive	\N	1981935	11236913	\N	5040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402670	Alive	\N	1982613	11237621	\N	5100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402730	Alive	\N	1982774	11237792	\N	5160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402790	Alive	\N	1983073	11238036	\N	5220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402850	Alive	\N	1983300	11238880	\N	5280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402910	Alive	\N	1983300	11238880	\N	5340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748402970	Alive	\N	1983553	11239230	\N	5400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403029	Alive	\N	1983619	11239342	\N	5460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403089	Alive	\N	1984363	11240242	\N	5520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403149	Alive	\N	1984524	11240413	\N	5580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403210	Alive	\N	1984524	11240413	\N	5640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403270	Alive	\N	1984685	11240584	\N	5700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403330	Alive	\N	1984685	11240584	\N	5760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403390	Alive	\N	1996088	11255463	\N	5820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403450	Alive	\N	1996611	11255939	\N	5880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403510	Alive	\N	1996611	11255939	\N	5940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403569	Alive	\N	1996706	11256110	\N	6000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403629	Alive	\N	1996772	11256222	\N	6060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403689	Alive	\N	2003896	11264201	\N	6120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403750	Alive	\N	2024659	11293500	\N	6180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403810	Alive	\N	2024659	11293500	\N	6240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403870	Alive	\N	2024978	11293850	\N	6300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403930	Alive	\N	2025086	11294060	\N	6360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748403990	Alive	\N	2025493	11294436	\N	6420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404050	Alive	\N	2025588	11294607	\N	6480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404109	Alive	\N	2025696	11294833	\N	6540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404169	Alive	\N	2025791	11295004	\N	6600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404229	Alive	\N	2026027	11296029	\N	6660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404290	Alive	\N	2026326	11296273	\N	6720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404350	Alive	\N	2026579	11296623	\N	6780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404410	Alive	\N	2026579	11296623	\N	6840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404470	Alive	\N	2026674	11296794	\N	6900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404530	Alive	\N	2026674	11296794	\N	6960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404590	Alive	\N	2027056	11297101	\N	7020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404649	Alive	\N	2027151	11297272	\N	7080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404709	Alive	\N	2027151	11297272	\N	7140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404769	Alive	\N	2126785	11400369	\N	7200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404830	Alive	\N	2127159	11401243	\N	7260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404890	Alive	\N	2153868	11428406	\N	7320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748404950	Alive	\N	2176556	11456921	\N	7380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405010	Alive	\N	2179654	11459464	\N	7440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405070	Alive	\N	2198808	11473010	\N	7500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405129	Alive	\N	2199789	11474796	\N	7560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405189	Alive	\N	2207436	11479262	\N	7620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405249	Alive	\N	2507374	19555500	\N	7680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405309	Alive	\N	2837915	40504086	\N	7740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405370	Alive	\N	2909463	42416174	\N	7800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405430	Alive	\N	3339657	57239255	\N	7860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405490	Alive	\N	4216265	73782467	\N	7920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405550	Alive	\N	4751861	88743800	\N	7980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405610	Alive	\N	4850077	90518246	\N	8040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405669	Alive	\N	4961005	91999803	\N	8100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405729	Alive	\N	5017189	93635320	\N	8160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405789	Alive	\N	5035665	93656749	\N	8220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405850	Alive	\N	5183244	97737125	\N	8280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405910	Alive	\N	5591701	109251653	\N	8340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748405970	Alive	\N	5802228	114601429	\N	8400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406030	Alive	\N	5861845	114635009	\N	8460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406090	Alive	\N	5930143	115812510	\N	8520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406150	Alive	\N	5986773	118111799	\N	8580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406209	Alive	\N	6350479	119349934	\N	8640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406269	Alive	\N	6608371	124409293	\N	8700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406329	Alive	\N	6750049	127198307	\N	8760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406390	Alive	\N	6844626	129254584	\N	8820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406450	Alive	\N	7020928	132477367	\N	8880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406510	Alive	\N	7898981	157097383	\N	8940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406570	Alive	\N	8145338	161126047	\N	9000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406630	Alive	\N	8676332	178421838	\N	9060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406689	Alive	\N	8957350	189579421	\N	9120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406749	Alive	\N	9405711	205772319	\N	9180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406809	Alive	\N	9871048	218818319	\N	9240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406870	Alive	\N	10205721	223653777	\N	9300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406930	Alive	\N	11001417	249645258	\N	9360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748406990	Alive	\N	11345621	257364142	\N	9420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407050	Alive	\N	11598763	263228335	\N	9480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407110	Alive	\N	12209470	279624365	\N	9540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407170	Alive	\N	13231163	310260300	\N	9600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407229	Alive	\N	13304730	311349531	\N	9660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407289	Alive	\N	13307882	311353716	\N	9720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407349	Alive	\N	13314208	311358860	\N	9780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407410	Alive	\N	13368736	311587829	\N	9840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407470	Alive	\N	13368736	311588735	\N	9900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407530	Alive	\N	13960891	324263355	\N	9960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407590	Alive	\N	14213959	325453325	\N	10020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407650	Alive	\N	14676589	328157978	\N	10080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407709	Alive	\N	14820809	328367830	\N	10140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407769	Alive	\N	15058366	328565106	\N	10200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407829	Alive	\N	15250060	328716125	\N	10260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407889	Alive	\N	15508173	328888234	\N	10320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748407950	Alive	\N	15695695	329045021	\N	10380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408010	Alive	\N	15889426	329197052	\N	10440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408070	Alive	\N	16067828	329333965	\N	10500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408130	Alive	\N	16254970	329517138	\N	10560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408190	Alive	\N	16511244	329811158	\N	10620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408249	Alive	\N	16713168	330000135	\N	10680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408309	Alive	\N	17004019	339860436	\N	10740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408369	Alive	\N	17263289	340028369	\N	10800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408430	Alive	\N	17445886	340152081	\N	10860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408490	Alive	\N	17626870	340266197	\N	10920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408550	Alive	\N	17909868	340506204	\N	10980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408610	Alive	\N	18129634	340647703	\N	11040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408670	Alive	\N	18309566	340798049	\N	11100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408730	Alive	\N	18479305	341006803	\N	11160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408789	Alive	\N	18671475	341287512	\N	11220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408849	Alive	\N	19476491	363693030	\N	11280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408909	Alive	\N	20489351	407328944	\N	11340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748408970	Alive	\N	20890628	418921550	\N	11400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409030	Alive	\N	20896844	418946695	\N	11460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409090	Alive	\N	20905149	418974833	\N	11520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409150	Alive	\N	21397080	423650116	\N	11580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409210	Alive	\N	21452101	423801572	\N	11640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409269	Alive	\N	21452431	423801914	\N	11700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409329	Alive	\N	21453016	423802443	\N	11760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409389	Alive	\N	21454599	423804214	\N	11820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409449	Alive	\N	21455383	423807122	\N	11880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409510	Alive	\N	21799215	424785797	\N	11940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409570	Alive	\N	21799455	424787233	\N	12000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409630	Alive	\N	21813480	424794936	\N	12060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409690	Alive	\N	21818933	424804034	\N	12120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409750	Alive	\N	21818933	424804034	\N	12180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409809	Alive	\N	21819277	424806565	\N	12240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748409856	Stop	\N	21819277	424806565	\N	12287	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748414942	Start	\N	\N	\N	00749c64ae6c_000_0000000460_0001140757	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415002	Alive	\N	121174	158989	00749c64ae6c_000_0000000460_0001140757	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415062	Alive	\N	127355	167066	00749c64ae6c_000_0000000460_0001140757	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415122	Alive	\N	134159	177872	00749c64ae6c_000_0000000460_0001140757	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415181	Alive	\N	142857	184713	00749c64ae6c_000_0000000460_0001140757	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415241	Alive	\N	149337	192534	00749c64ae6c_000_0000000460_0001140757	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415302	Alive	\N	170576	221085	00749c64ae6c_000_0000000460_0001140757	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415362	Alive	\N	172800	226164	00749c64ae6c_000_0000000460_0001140757	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415422	Alive	\N	175018	228797	00749c64ae6c_000_0000000460_0001140757	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415482	Alive	\N	176405	229813	00749c64ae6c_000_0000000460_0001140757	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415542	Alive	\N	177885	231188	00749c64ae6c_000_0000000460_0001140757	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415602	Alive	\N	178522	231985	00749c64ae6c_000_0000000460_0001140757	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415661	Alive	\N	178933	232268	00749c64ae6c_000_0000000460_0001140757	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415721	Alive	\N	179267	232715	00749c64ae6c_000_0000000460_0001140757	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415781	Alive	\N	184164	239168	00749c64ae6c_000_0000000460_0001140757	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415842	Alive	\N	184164	239168	00749c64ae6c_000_0000000460_0001140757	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415902	Alive	\N	184852	245407	00749c64ae6c_000_0000000460_0001140757	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748415962	Alive	\N	185153	245651	00749c64ae6c_000_0000000460_0001140757	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748416022	Alive	\N	185629	246254	00749c64ae6c_000_0000000460_0001140757	1080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748416036	Stop	\N	185629	246254	00749c64ae6c_000_0000000460_0001140757	1094	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748479449	Start	\N	\N	\N	00749c64ae6c_000_0000000461_0001205273	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748479509	Alive	\N	0	0	00749c64ae6c_000_0000000461_0001205273	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748479569	Alive	\N	915462	4340931	00749c64ae6c_000_0000000461_0001205273	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748479629	Alive	\N	1092347	7909133	00749c64ae6c_000_0000000461_0001205273	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748479689	Alive	\N	1094975	7912623	00749c64ae6c_000_0000000461_0001205273	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748479748	Alive	\N	1168693	8214936	00749c64ae6c_000_0000000461_0001205273	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748479808	Alive	\N	1347161	8646907	00749c64ae6c_000_0000000461_0001205273	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748479869	Alive	\N	1399792	8716026	00749c64ae6c_000_0000000461_0001205273	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748479929	Alive	\N	1411320	8725707	00749c64ae6c_000_0000000461_0001205273	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748479989	Alive	\N	1597360	17348071	00749c64ae6c_000_0000000461_0001205273	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480049	Alive	\N	1606687	17359798	00749c64ae6c_000_0000000461_0001205273	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480109	Alive	\N	1622819	17374265	00749c64ae6c_000_0000000461_0001205273	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480169	Alive	\N	1640991	17384468	00749c64ae6c_000_0000000461_0001205273	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480229	Alive	\N	1655028	17405505	00749c64ae6c_000_0000000461_0001205273	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480288	Alive	\N	1717958	17476994	00749c64ae6c_000_0000000461_0001205273	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480348	Alive	\N	1736458	17491347	00749c64ae6c_000_0000000461_0001205273	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480409	Alive	\N	1768016	17513832	00749c64ae6c_000_0000000461_0001205273	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480469	Alive	\N	1784030	17526310	00749c64ae6c_000_0000000461_0001205273	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480529	Alive	\N	1794055	17536279	00749c64ae6c_000_0000000461_0001205273	1080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480589	Alive	\N	1805374	17543377	00749c64ae6c_000_0000000461_0001205273	1140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480649	Alive	\N	1806230	17546315	00749c64ae6c_000_0000000461_0001205273	1200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480709	Alive	\N	1806230	17546315	00749c64ae6c_000_0000000461_0001205273	1260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480769	Alive	\N	1806942	17546952	00749c64ae6c_000_0000000461_0001205273	1320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480828	Alive	\N	1807178	17548620	00749c64ae6c_000_0000000461_0001205273	1380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480889	Alive	\N	1807178	17548620	00749c64ae6c_000_0000000461_0001205273	1440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748480949	Alive	\N	1807339	17548791	00749c64ae6c_000_0000000461_0001205273	1500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481009	Alive	\N	1807339	17548791	00749c64ae6c_000_0000000461_0001205273	1560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481069	Alive	\N	1807865	17549318	00749c64ae6c_000_0000000461_0001205273	1620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481129	Alive	\N	2041599	18062709	00749c64ae6c_000_0000000461_0001205273	1680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481189	Alive	\N	2041653	18062814	00749c64ae6c_000_0000000461_0001205273	1740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481249	Alive	\N	2042128	18066011	00749c64ae6c_000_0000000461_0001205273	1800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481309	Alive	\N	2042128	18066011	00749c64ae6c_000_0000000461_0001205273	1860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481368	Alive	\N	2043500	18067639	00749c64ae6c_000_0000000461_0001205273	1920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481429	Alive	\N	2043500	18067639	00749c64ae6c_000_0000000461_0001205273	1980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481489	Alive	\N	2043500	18067639	00749c64ae6c_000_0000000461_0001205273	2040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481549	Alive	\N	2043595	18067810	00749c64ae6c_000_0000000461_0001205273	2100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481609	Alive	\N	2043595	18067810	00749c64ae6c_000_0000000461_0001205273	2160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481669	Alive	\N	2044204	18068400	00749c64ae6c_000_0000000461_0001205273	2220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481729	Alive	\N	2044204	18068400	00749c64ae6c_000_0000000461_0001205273	2280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481789	Alive	\N	2044204	18068400	00749c64ae6c_000_0000000461_0001205273	2340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481849	Alive	\N	2044299	18068571	00749c64ae6c_000_0000000461_0001205273	2400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481908	Alive	\N	2044299	18068571	00749c64ae6c_000_0000000461_0001205273	2460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748481969	Alive	\N	2198369	18859127	00749c64ae6c_000_0000000461_0001205273	2520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482029	Alive	\N	2198477	18859265	00749c64ae6c_000_0000000461_0001205273	2580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482089	Alive	\N	2198477	18859265	00749c64ae6c_000_0000000461_0001205273	2640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482149	Alive	\N	2198572	18859436	00749c64ae6c_000_0000000461_0001205273	2700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482209	Alive	\N	2200712	18863476	00749c64ae6c_000_0000000461_0001205273	2760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482269	Alive	\N	2201238	18864003	00749c64ae6c_000_0000000461_0001205273	2820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482329	Alive	\N	2201238	18864003	00749c64ae6c_000_0000000461_0001205273	2880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482389	Alive	\N	2201400	18864225	00749c64ae6c_000_0000000461_0001205273	2940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482448	Alive	\N	2201495	18864396	00749c64ae6c_000_0000000461_0001205273	3000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482508	Alive	\N	2201495	18864396	00749c64ae6c_000_0000000461_0001205273	3060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482569	Alive	\N	2202050	18864951	00749c64ae6c_000_0000000461_0001205273	3120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482629	Alive	\N	2202050	18864951	00749c64ae6c_000_0000000461_0001205273	3180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482689	Alive	\N	2202050	18864951	00749c64ae6c_000_0000000461_0001205273	3240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482749	Alive	\N	2202211	18865122	00749c64ae6c_000_0000000461_0001205273	3300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482809	Alive	\N	2221372	18888215	00749c64ae6c_000_0000000461_0001205273	3360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482869	Alive	\N	2226142	18894560	00749c64ae6c_000_0000000461_0001205273	3420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482929	Alive	\N	2226142	18895520	00749c64ae6c_000_0000000461_0001205273	3480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748482988	Alive	\N	2226142	18895520	00749c64ae6c_000_0000000461_0001205273	3540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483049	Alive	\N	2513064	22204806	00749c64ae6c_000_0000000461_0001205273	3600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483109	Alive	\N	2516749	22257603	00749c64ae6c_000_0000000461_0001205273	3660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483169	Alive	\N	2546981	22350554	00749c64ae6c_000_0000000461_0001205273	3720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483229	Alive	\N	2555456	22369057	00749c64ae6c_000_0000000461_0001205273	3780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483289	Alive	\N	2580515	22404082	00749c64ae6c_000_0000000461_0001205273	3840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483349	Alive	\N	2581306	22405360	00749c64ae6c_000_0000000461_0001205273	3900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483409	Alive	\N	2582690	22406596	00749c64ae6c_000_0000000461_0001205273	3960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483469	Alive	\N	2606783	22630264	00749c64ae6c_000_0000000461_0001205273	4020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483528	Alive	\N	2624850	22652568	00749c64ae6c_000_0000000461_0001205273	4080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483589	Alive	\N	2647134	22861681	00749c64ae6c_000_0000000461_0001205273	4140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483649	Alive	\N	2671574	22892467	00749c64ae6c_000_0000000461_0001205273	4200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483709	Alive	\N	2693615	22914424	00749c64ae6c_000_0000000461_0001205273	4260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483769	Alive	\N	2710080	22940747	00749c64ae6c_000_0000000461_0001205273	4320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483829	Alive	\N	2745580	23129377	00749c64ae6c_000_0000000461_0001205273	4380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483889	Alive	\N	2747421	23133071	00749c64ae6c_000_0000000461_0001205273	4440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748483949	Alive	\N	2892875	23243004	00749c64ae6c_000_0000000461_0001205273	4500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748484008	Alive	\N	2912072	23273988	00749c64ae6c_000_0000000461_0001205273	4560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748484068	Alive	\N	2933049	23300291	00749c64ae6c_000_0000000461_0001205273	4620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748484129	Alive	\N	2942623	23315772	00749c64ae6c_000_0000000461_0001205273	4680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748484189	Alive	\N	2948722	23327178	00749c64ae6c_000_0000000461_0001205273	4740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748484249	Alive	\N	2949868	23328714	00749c64ae6c_000_0000000461_0001205273	4800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748484309	Alive	\N	2949868	23328714	00749c64ae6c_000_0000000461_0001205273	4860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748484369	Alive	\N	2950581	23329129	00749c64ae6c_000_0000000461_0001205273	4920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748484429	Alive	\N	2950581	23329189	00749c64ae6c_000_0000000461_0001205273	4980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748484489	Alive	\N	2950581	23329189	00749c64ae6c_000_0000000461_0001205273	5040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748484548	Alive	\N	2950676	23334304	00749c64ae6c_000_0000000461_0001205273	5100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748484608	Alive	\N	2962790	23359669	00749c64ae6c_000_0000000461_0001205273	5160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748484669	Alive	\N	2964265	23360859	00749c64ae6c_000_0000000461_0001205273	5220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748484688	Stop	\N	2964265	23360859	00749c64ae6c_000_0000000461_0001205273	5239	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748485522	Start	\N	\N	\N	00749c64ae6c_000_0000000462_0001211349	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748485583	Alive	\N	0	0	00749c64ae6c_000_0000000462_0001211349	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748485642	Alive	\N	97816	163150	00749c64ae6c_000_0000000462_0001211349	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748485703	Alive	\N	104301	180894	00749c64ae6c_000_0000000462_0001211349	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748485724	Stop	\N	104301	180894	00749c64ae6c_000_0000000462_0001211349	201	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748486319	Start	\N	\N	\N	00749c64ae6c_000_0000000463_0001212135	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748486417	Stop	\N	36781	62981	00749c64ae6c_000_0000000463_0001212135	97	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748486513	Start	\N	\N	\N	00749c64ae6c_000_0000000464_0001212341	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748486705	Stop	\N	31944	49754	00749c64ae6c_000_0000000464_0001212341	192	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748486759	Start	\N	\N	\N	00749c64ae6c_000_0000000465_0001212586	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748487017	Stop	\N	60348	115028	00749c64ae6c_000_0000000465_0001212586	258	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748487159	Start	\N	\N	\N	00749c64ae6c_000_0000000466_0001212912	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748487337	Stop	\N	45723	68925	00749c64ae6c_000_0000000466_0001212912	178	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748487401	Start	\N	\N	\N	00749c64ae6c_000_0000000467_0001213228	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748487608	Stop	\N	210391	255935	00749c64ae6c_000_0000000467_0001213228	208	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748487709	Start	\N	\N	\N	00749c64ae6c_000_0000000468_0001213537	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748488209	Stop	\N	112764	176898	00749c64ae6c_000_0000000468_0001213537	500	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748488487	Start	\N	\N	\N	00749c64ae6c_000_0000000469_0001214309	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748490659	Stop	\N	2679561	49766489	00749c64ae6c_000_0000000469_0001214309	2172	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748490779	Start	\N	\N	\N	00749c64ae6c_000_0000000470_0001216606	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748496636	Stop	\N	16096467	577294344	00749c64ae6c_000_0000000470_0001216606	5857	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748496714	Start	\N	\N	\N	00749c64ae6c_000_0000000471_0001222533	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748497005	Stop	\N	81397	134395	00749c64ae6c_000_0000000471_0001222533	291	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748497140	Start	\N	\N	\N	00749c64ae6c_000_0000000472_0001222961	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748504239	Stop	\N	3407988	90115422	00749c64ae6c_000_0000000472_0001222961	7099	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748504319	Start	\N	\N	\N	00749c64ae6c_000_0000000474_0001230144	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748514375	Stop	\N	5446585	142150674	00749c64ae6c_000_0000000474_0001230144	10056	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748573309	Start	\N	\N	\N	00749c64ae6c_000_0000000475_0001299136	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748574432	Stop	\N	146898	1148236	00749c64ae6c_000_0000000475_0001299136	1123	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748574652	Start	\N	\N	\N	00749c64ae6c_000_0000000476_0001300482	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1748578335	Stop	\N	279964	365320	00749c64ae6c_000_0000000476_0001300482	3683	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748585739	Start	\N	\N	\N	00749c64ae6c_000_0000000479_0001311557	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748587601	Stop	\N	357037	694763	00749c64ae6c_000_0000000479_0001311557	1863	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748587654	Start	\N	\N	\N	00749c64ae6c_000_0000000480_0001313473	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748591147	Start	\N	\N	\N	00749c64ae6c_000_0000000488_0001316974	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1748599704	Stop	\N	30688354	888244651	00749c64ae6c_000_0000000488_0001316974	8558	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748825408	Start	\N	\N	\N	00749c64ae6c_000_0000000489_0001551232	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748825529	Stop	\N	41824	103752	00749c64ae6c_000_0000000489_0001551232	120	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+john_doe	1748825918	Start	\N	\N	\N	00749c64ae6c_000_0000000492_0001551747	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+john_doe	1748826039	Stop	\N	39658	43883	00749c64ae6c_000_0000000492_0001551747	120	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748841678	Start	\N	\N	\N	00749c64ae6c_000_0000000001_0000001325	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748853639	Stop	\N	3420878	87689204	00749c64ae6c_000_0000000001_0000001325	11961	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748853667	Start	\N	\N	\N	00749c64ae6c_000_0000000002_0000013312	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748853920	Stop	\N	64034	112852	00749c64ae6c_000_0000000002_0000013312	254	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748853980	Start	\N	\N	\N	00749c64ae6c_000_0000000003_0000013627	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748854518	Stop	\N	952985	32873347	00749c64ae6c_000_0000000003_0000013627	538	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748854571	Start	\N	\N	\N	00749c64ae6c_000_0000000004_0000014218	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748854737	Stop	\N	43170	68176	00749c64ae6c_000_0000000004_0000014218	166	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748854765	Start	\N	\N	\N	00749c64ae6c_000_0000000005_0000014412	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748854876	Stop	\N	56650	91225	00749c64ae6c_000_0000000005_0000014412	111	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748854928	Start	\N	\N	\N	00749c64ae6c_000_0000000006_0000014575	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748855469	Stop	\N	2482935	101015255	00749c64ae6c_000_0000000006_0000014575	541	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1748855511	Start	\N	\N	\N	00749c64ae6c_000_0000000007_0000015157	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	f24031c367bf
+limit	1748855558	Stop	\N	0	0	00749c64ae6c_000_0000000007_0000015157	47	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	f24031c367bf
+testuser	1748921028	Start	\N	\N	\N	00749c64ae6c_000_0000000020_0000080675	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	eac13825b5b1
+testuser	1748921149	Stop	\N	2128068	5978698	00749c64ae6c_000_0000000020_0000080675	120	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	eac13825b5b1
+limit	1749001655	Start	\N	\N	\N	00749c64ae6c_000_0000000030_0000161301	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1749001687	Stop	\N	0	0	00749c64ae6c_000_0000000030_0000161301	32	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1749003019	Start	\N	\N	\N	00749c64ae6c_000_0000000031_0000162665	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1749003150	Stop	\N	86937	183447	00749c64ae6c_000_0000000031_0000162665	132	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1749003225	Start	\N	\N	\N	00749c64ae6c_000_0000000032_0000162871	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1749003259	Stop	\N	0	0	00749c64ae6c_000_0000000032_0000162871	35	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1749003367	Start	\N	\N	\N	00749c64ae6c_000_0000000033_0000163012	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1749003390	Stop	\N	0	0	00749c64ae6c_000_0000000033_0000163012	23	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1749003569	Start	\N	\N	\N	00749c64ae6c_000_0000000034_0000163213	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1749003687	Stop	\N	38225	60674	00749c64ae6c_000_0000000034_0000163213	119	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1749003706	Start	\N	\N	\N	00749c64ae6c_000_0000000035_0000163353	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1749004499	Stop	\N	354347	923676	00749c64ae6c_000_0000000035_0000163353	793	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1749004769	Start	\N	\N	\N	00749c64ae6c_000_0000000038_0000164416	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1749004795	Stop	\N	0	0	00749c64ae6c_000_0000000038_0000164416	26	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1749004847	Start	\N	\N	\N	00749c64ae6c_000_0000000039_0000164494	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1749004918	Stop	\N	31287	61260	00749c64ae6c_000_0000000039_0000164494	72	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1749004925	Start	\N	\N	\N	00749c64ae6c_000_0000000040_0000164572	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1749005038	Stop	\N	40783	77587	00749c64ae6c_000_0000000040_0000164572	113	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1749005041	Start	\N	\N	\N	00749c64ae6c_000_0000000041_0000164688	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1749005158	Stop	\N	80234	112590	00749c64ae6c_000_0000000041_0000164688	118	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1749005162	Start	\N	\N	\N	00749c64ae6c_000_0000000042_0000164809	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1749005178	Stop	\N	0	0	00749c64ae6c_000_0000000042_0000164809	17	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1749005255	Start	\N	\N	\N	00749c64ae6c_000_0000000043_0000164900	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1749005338	Stop	\N	650413	20466451	00749c64ae6c_000_0000000043_0000164900	84	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1749005341	Start	\N	\N	\N	00749c64ae6c_000_0000000044_0000164988	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1749005355	Stop	\N	0	0	00749c64ae6c_000_0000000044_0000164988	15	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749006589	Start	\N	\N	\N	00749c64ae6c_000_0000000046_0000166236	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749007406	Stop	\N	805341	94071670	00749c64ae6c_000_0000000046_0000166236	816	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749009047	Start	\N	\N	\N	00749c64ae6c_000_0000000047_0000168694	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749009220	Stop	\N	789819	86743253	00749c64ae6c_000_0000000047_0000168694	173	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749011529	Start	\N	\N	\N	00749c64ae6c_000_0000000048_0000171176	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749011638	Stop	\N	727160	57088705	00749c64ae6c_000_0000000048_0000171176	109	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749012838	Start	\N	\N	\N	00749c64ae6c_000_0000000050_0000172483	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749012958	Stop	\N	630797	40620873	00749c64ae6c_000_0000000050_0000172483	120	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749013866	Start	\N	\N	\N	00749c64ae6c_000_0000000052_0000173511	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749013978	Stop	\N	389858	14070548	00749c64ae6c_000_0000000052_0000173511	112	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1749014651	Start	\N	\N	\N	00749c64ae6c_000_0000000054_0000174298	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	f24031c367bf
+limit	1749014998	Stop	\N	1735196	36973618	00749c64ae6c_000_0000000054_0000174298	347	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	f24031c367bf
+dave	1749015117	Start	\N	\N	\N	00749c64ae6c_000_0000000060_0000174764	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	964360ea7773
+limit	1749017191	Start	\N	\N	\N	00749c64ae6c_000_0000000061_0000176839	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	f24031c367bf
+limit	1749017698	Stop	\N	916102	34815858	00749c64ae6c_000_0000000061_0000176839	507	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	f24031c367bf
+dave	1749018550	Stop	\N	2379436	7315564	00749c64ae6c_000_0000000060_0000174764	3434	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	964360ea7773
+dave	1749018560	Start	\N	\N	\N	00749c64ae6c_000_0000000064_0000178201	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	964360ea7773
+dave	1749018753	Stop	\N	0	0	00749c64ae6c_000_0000000064_0000178201	193	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	964360ea7773
+testuser	1749018956	Start	\N	\N	\N	00749c64ae6c_000_0000000065_0000178603	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	eac13825b5b1
+testuser	1749018971	Stop	\N	0	0	00749c64ae6c_000_0000000065_0000178603	16	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	eac13825b5b1
+dave	1749019069	Start	\N	\N	\N	00749c64ae6c_000_0000000066_0000178716	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	964360ea7773
+dave	1749019111	Stop	\N	0	0	00749c64ae6c_000_0000000066_0000178716	43	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	964360ea7773
+dave	1749026301	Start	\N	\N	\N	00749c64ae6c_000_0000000073_0000185948	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+dave	1749026330	Stop	\N	0	0	00749c64ae6c_000_0000000073_0000185948	28	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+dave	1749027094	Start	\N	\N	\N	00749c64ae6c_000_0000000075_0000186741	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+dave	1749027166	Stop	\N	0	0	00749c64ae6c_000_0000000075_0000186741	72	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+dave	1749027214	Start	\N	\N	\N	00749c64ae6c_000_0000000077_0000186861	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	f24031c367bf
+dave	1749027243	Stop	\N	0	0	00749c64ae6c_000_0000000077_0000186861	30	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	f24031c367bf
+dave	1749031713	Start	\N	\N	\N	00749c64ae6c_000_0000000082_0000191356	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	964360ea7773
+dave	1749031798	Stop	\N	0	0	00749c64ae6c_000_0000000082_0000191356	86	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	964360ea7773
+limit	1749032148	Stop	\N	574128	2010864	00749c64ae6c_000_0000000081_0000190822	967	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1749104790	Start	\N	\N	\N	00749c64ae6c_000_0000000086_0000264437	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testlimit	1749105615	Stop	\N	299742	312247	00749c64ae6c_000_0000000086_0000264437	826	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749106761	Start	\N	\N	\N	00749c64ae6c_000_0000000002_0000000466	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749108880	Stop	\N	843470	19621764	00749c64ae6c_000_0000000002_0000000466	2119	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749108916	Start	\N	\N	\N	00749c64ae6c_000_0000000005_0000002623	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749110570	Stop	\N	1799982	20531222	00749c64ae6c_000_0000000005_0000002623	1654	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749110638	Start	\N	\N	\N	00749c64ae6c_000_0000000006_0000004323	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749110829	Stop	\N	368017	797304	00749c64ae6c_000_0000000006_0000004323	191	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749110869	Start	\N	\N	\N	00749c64ae6c_000_0000000007_0000004576	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749111740	Stop	\N	1868030	45163692	00749c64ae6c_000_0000000007_0000004576	866	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749112050	Start	\N	\N	\N	00749c64ae6c_000_0000000008_0000005759	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749112128	Stop	\N	0	0	00749c64ae6c_000_0000000008_0000005759	78	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749112308	Start	\N	\N	\N	00749c64ae6c_000_0000000009_0000006014	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749112695	Stop	\N	1329871	53725806	00749c64ae6c_000_0000000009_0000006014	387	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749112777	Start	\N	\N	\N	00749c646f48_000_0000000001_1749112767	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	d89e612476f3
+newuser	1749112889	Stop	\N	282192	5493669	00749c646f48_000_0000000001_1749112767	112	User-Request	\N	1	192.168.90.181	\N	\N	\N	\N	00749c646f48:restricted	d89e612476f3
+newuser	1749113445	Start	\N	\N	\N	00749c64ae6c_000_0000000011_0000007152	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1749113511	Start	\N	\N	\N	00749c646f48_000_0000000004_1749113509	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+mca	1749113561	Stop	\N	0	0	00749c646f48_000_0000000004_1749113509	51	User-Request	\N	1	192.168.90.182	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1749114025	Alive	\N	131365	356191	00749c64ae6c_000_0000000011_0000007152	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114085	Alive	\N	349467	3944540	00749c64ae6c_000_0000000011_0000007152	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114145	Alive	\N	382790	4075659	00749c64ae6c_000_0000000011_0000007152	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114205	Alive	\N	398188	4094567	00749c64ae6c_000_0000000011_0000007152	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114265	Alive	\N	1062379	19859220	00749c64ae6c_000_0000000011_0000007152	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114325	Alive	\N	1474544	30476810	00749c64ae6c_000_0000000011_0000007152	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114385	Alive	\N	1478234	30481232	00749c64ae6c_000_0000000011_0000007152	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114445	Alive	\N	1483735	30484360	00749c64ae6c_000_0000000011_0000007152	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114505	Alive	\N	1502413	30495898	00749c64ae6c_000_0000000011_0000007152	1080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114565	Alive	\N	1522835	30521697	00749c64ae6c_000_0000000011_0000007152	1140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114625	Alive	\N	1577018	30628723	00749c64ae6c_000_0000000011_0000007152	1200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114685	Alive	\N	1583281	30637641	00749c64ae6c_000_0000000011_0000007152	1260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114745	Alive	\N	1585572	30639316	00749c64ae6c_000_0000000011_0000007152	1320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114805	Alive	\N	1656510	30691820	00749c64ae6c_000_0000000011_0000007152	1380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114865	Alive	\N	1665527	30712321	00749c64ae6c_000_0000000011_0000007152	1440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114924	Alive	\N	1681398	30724454	00749c64ae6c_000_0000000011_0000007152	1500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749114985	Alive	\N	1684592	30733540	00749c64ae6c_000_0000000011_0000007152	1560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115045	Alive	\N	2397913	54633106	00749c64ae6c_000_0000000011_0000007152	1620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115105	Alive	\N	3415539	79370982	00749c64ae6c_000_0000000011_0000007152	1680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115165	Alive	\N	3919168	89314000	00749c64ae6c_000_0000000011_0000007152	1740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115225	Alive	\N	5025420	119966366	00749c64ae6c_000_0000000011_0000007152	1800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115285	Alive	\N	5500893	135015839	00749c64ae6c_000_0000000011_0000007152	1860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115345	Alive	\N	6005128	154029788	00749c64ae6c_000_0000000011_0000007152	1920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115404	Alive	\N	7435188	193890109	00749c64ae6c_000_0000000011_0000007152	1980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115465	Alive	\N	8559500	226451202	00749c64ae6c_000_0000000011_0000007152	2040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115525	Alive	\N	8931164	235901083	00749c64ae6c_000_0000000011_0000007152	2100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115585	Alive	\N	9336491	248562834	00749c64ae6c_000_0000000011_0000007152	2160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115645	Alive	\N	9970991	267158493	00749c64ae6c_000_0000000011_0000007152	2220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115705	Alive	\N	10197365	272680153	00749c64ae6c_000_0000000011_0000007152	2280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115765	Alive	\N	10888736	288425326	00749c64ae6c_000_0000000011_0000007152	2340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115825	Alive	\N	11491683	304969138	00749c64ae6c_000_0000000011_0000007152	2400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115885	Alive	\N	12044234	319950251	00749c64ae6c_000_0000000011_0000007152	2460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749115945	Alive	\N	12428639	330792107	00749c64ae6c_000_0000000011_0000007152	2520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116005	Alive	\N	13492423	368894857	00749c64ae6c_000_0000000011_0000007152	2580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116065	Alive	\N	13792450	376063607	00749c64ae6c_000_0000000011_0000007152	2640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116125	Alive	\N	14211458	386093810	00749c64ae6c_000_0000000011_0000007152	2700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116185	Alive	\N	14668765	402334137	00749c64ae6c_000_0000000011_0000007152	2760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116245	Alive	\N	14793749	406547818	00749c64ae6c_000_0000000011_0000007152	2820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116305	Alive	\N	15456850	425296026	00749c64ae6c_000_0000000011_0000007152	2880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116364	Alive	\N	16139852	438436801	00749c64ae6c_000_0000000011_0000007152	2940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116425	Alive	\N	16884998	463909825	00749c64ae6c_000_0000000011_0000007152	3000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116485	Alive	\N	17168623	470384793	00749c64ae6c_000_0000000011_0000007152	3060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116545	Alive	\N	17786838	490749971	00749c64ae6c_000_0000000011_0000007152	3120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116605	Alive	\N	18074512	500476018	00749c64ae6c_000_0000000011_0000007152	3180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116665	Alive	\N	18398599	505973294	00749c64ae6c_000_0000000011_0000007152	3240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116725	Alive	\N	18928449	514105869	00749c64ae6c_000_0000000011_0000007152	3300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116785	Alive	\N	19062473	518897540	00749c64ae6c_000_0000000011_0000007152	3360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116845	Alive	\N	19147301	518951992	00749c64ae6c_000_0000000011_0000007152	3420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116905	Alive	\N	19302566	519262969	00749c64ae6c_000_0000000011_0000007152	3480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749116965	Alive	\N	19418901	519346489	00749c64ae6c_000_0000000011_0000007152	3540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117025	Alive	\N	19589203	519456145	00749c64ae6c_000_0000000011_0000007152	3600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117085	Alive	\N	19794423	519545987	00749c64ae6c_000_0000000011_0000007152	3660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117145	Alive	\N	19855089	519606814	00749c64ae6c_000_0000000011_0000007152	3720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117205	Alive	\N	19968667	519673487	00749c64ae6c_000_0000000011_0000007152	3780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117265	Alive	\N	19971713	519677016	00749c64ae6c_000_0000000011_0000007152	3840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117325	Alive	\N	19973501	519681538	00749c64ae6c_000_0000000011_0000007152	3900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117385	Alive	\N	19987724	519698052	00749c64ae6c_000_0000000011_0000007152	3960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117445	Alive	\N	19987885	519698223	00749c64ae6c_000_0000000011_0000007152	4020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117505	Alive	\N	19997652	519707696	00749c64ae6c_000_0000000011_0000007152	4080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117565	Alive	\N	20002145	519720698	00749c64ae6c_000_0000000011_0000007152	4140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117625	Alive	\N	20002494	519720989	00749c64ae6c_000_0000000011_0000007152	4200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117685	Alive	\N	20019207	519742733	00749c64ae6c_000_0000000011_0000007152	4260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117745	Alive	\N	20096626	519899150	00749c64ae6c_000_0000000011_0000007152	4320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117805	Alive	\N	20127872	519924146	00749c64ae6c_000_0000000011_0000007152	4380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117865	Alive	\N	20128855	519926075	00749c64ae6c_000_0000000011_0000007152	4440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117925	Alive	\N	20129016	519926246	00749c64ae6c_000_0000000011_0000007152	4500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749117985	Alive	\N	20129520	519927003	00749c64ae6c_000_0000000011_0000007152	4560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749118045	Alive	\N	20129628	519929459	00749c64ae6c_000_0000000011_0000007152	4620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749118105	Alive	\N	20288899	520176526	00749c64ae6c_000_0000000011_0000007152	4680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749118165	Alive	\N	20289665	520182911	00749c64ae6c_000_0000000011_0000007152	4740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749118225	Alive	\N	20296293	520191746	00749c64ae6c_000_0000000011_0000007152	4800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749118285	Alive	\N	20316716	520209571	00749c64ae6c_000_0000000011_0000007152	4860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749118345	Alive	\N	20317872	520216839	00749c64ae6c_000_0000000011_0000007152	4920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749118405	Alive	\N	20320127	520222954	00749c64ae6c_000_0000000011_0000007152	4980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749118464	Alive	\N	20320442	520229214	00749c64ae6c_000_0000000011_0000007152	5040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749118525	Alive	\N	20320442	520229214	00749c64ae6c_000_0000000011_0000007152	5100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749118585	Alive	\N	20320442	520229214	00749c64ae6c_000_0000000011_0000007152	5160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749118645	Alive	\N	20320442	520229214	00749c64ae6c_000_0000000011_0000007152	5220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749118705	Alive	\N	20320442	520229214	00749c64ae6c_000_0000000011_0000007152	5280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749118716	Stop	\N	20320442	520229214	00749c64ae6c_000_0000000011_0000007152	5271	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749432388	Start	\N	\N	\N	00749c64ae6c_000_0000000013_0000326097	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749432448	Alive	\N	0	0	00749c64ae6c_000_0000000013_0000326097	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749432509	Alive	\N	2578149	4235601	00749c64ae6c_000_0000000013_0000326097	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749432569	Alive	\N	4697396	5428211	00749c64ae6c_000_0000000013_0000326097	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749432629	Alive	\N	4736943	5469084	00749c64ae6c_000_0000000013_0000326097	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749432689	Alive	\N	5439949	5506143	00749c64ae6c_000_0000000013_0000326097	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1749608920	Start	\N	\N	\N	00749c64ae6c_000_0000000020_0000502627	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1749608980	Alive	\N	0	0	00749c64ae6c_000_0000000020_0000502627	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1749609009	Stop	\N	58449	438051	00749c64ae6c_000_0000000020_0000502627	88	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1749609011	Start	\N	\N	\N	00749c64ae6c_000_0000000022_0000502720	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1749609063	Stop	\N	0	0	00749c64ae6c_000_0000000022_0000502720	52	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625145	Start	\N	\N	\N	00749c64ae6c_000_0000000030_0000518854	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625153	Stop	\N	0	0	00749c64ae6c_000_0000000030_0000518854	8	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625173	Start	\N	\N	\N	00749c64ae6c_000_0000000031_0000518880	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625180	Stop	\N	0	0	00749c64ae6c_000_0000000031_0000518880	7	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625220	Start	\N	\N	\N	00749c64ae6c_000_0000000032_0000518929	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625227	Stop	\N	0	0	00749c64ae6c_000_0000000032_0000518929	7	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625249	Start	\N	\N	\N	00749c64ae6c_000_0000000033_0000518958	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625256	Stop	\N	0	0	00749c64ae6c_000_0000000033_0000518958	7	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625275	Start	\N	\N	\N	00749c64ae6c_000_0000000034_0000518983	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625281	Stop	\N	0	0	00749c64ae6c_000_0000000034_0000518983	6	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625584	Start	\N	\N	\N	00749c64ae6c_000_0000000037_0000519292	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625644	Alive	\N	0	0	00749c64ae6c_000_0000000037_0000519292	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625704	Alive	\N	239755	486830	00749c64ae6c_000_0000000037_0000519292	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625713	Stop	\N	239755	486830	00749c64ae6c_000_0000000037_0000519292	129	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625877	Start	\N	\N	\N	00749c64ae6c_000_0000000039_0000519586	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625937	Alive	\N	0	0	00749c64ae6c_000_0000000039_0000519586	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749625997	Alive	\N	93647	139705	00749c64ae6c_000_0000000039_0000519586	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626057	Alive	\N	115857	166673	00749c64ae6c_000_0000000039_0000519586	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626117	Alive	\N	117966	168652	00749c64ae6c_000_0000000039_0000519586	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626177	Alive	\N	117966	168652	00749c64ae6c_000_0000000039_0000519586	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626237	Alive	\N	118441	169449	00749c64ae6c_000_0000000039_0000519586	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626297	Alive	\N	124952	176913	00749c64ae6c_000_0000000039_0000519586	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626357	Alive	\N	126937	178927	00749c64ae6c_000_0000000039_0000519586	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626416	Alive	\N	127473	181489	00749c64ae6c_000_0000000039_0000519586	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626477	Alive	\N	128097	182129	00749c64ae6c_000_0000000039_0000519586	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626537	Alive	\N	128258	182412	00749c64ae6c_000_0000000039_0000519586	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626597	Alive	\N	128258	182412	00749c64ae6c_000_0000000039_0000519586	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626657	Alive	\N	128862	182893	00749c64ae6c_000_0000000039_0000519586	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626717	Alive	\N	180527	205570	00749c64ae6c_000_0000000039_0000519586	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626777	Alive	\N	180893	207629	00749c64ae6c_000_0000000039_0000519586	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626837	Alive	\N	180893	207629	00749c64ae6c_000_0000000039_0000519586	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626897	Alive	\N	181054	207800	00749c64ae6c_000_0000000039_0000519586	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749626956	Alive	\N	181680	208447	00749c64ae6c_000_0000000039_0000519586	1080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627017	Alive	\N	252522	262003	00749c64ae6c_000_0000000039_0000519586	1140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627077	Alive	\N	315184	290465	00749c64ae6c_000_0000000039_0000519586	1200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627137	Alive	\N	315969	291304	00749c64ae6c_000_0000000039_0000519586	1260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627197	Alive	\N	349764	311788	00749c64ae6c_000_0000000039_0000519586	1320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627257	Alive	\N	352918	317763	00749c64ae6c_000_0000000039_0000519586	1380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627317	Alive	\N	355935	320308	00749c64ae6c_000_0000000039_0000519586	1440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627377	Alive	\N	360575	322969	00749c64ae6c_000_0000000039_0000519586	1500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627437	Alive	\N	361047	323623	00749c64ae6c_000_0000000039_0000519586	1560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627496	Alive	\N	362000	324544	00749c64ae6c_000_0000000039_0000519586	1620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627557	Alive	\N	918194	12044069	00749c64ae6c_000_0000000039_0000519586	1680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627617	Alive	\N	1483625	27906440	00749c64ae6c_000_0000000039_0000519586	1740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627677	Alive	\N	1749165	41134201	00749c64ae6c_000_0000000039_0000519586	1800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627737	Alive	\N	1932788	54854186	00749c64ae6c_000_0000000039_0000519586	1860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627797	Alive	\N	2193215	73608387	00749c64ae6c_000_0000000039_0000519586	1920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627857	Alive	\N	2274051	76734953	00749c64ae6c_000_0000000039_0000519586	1980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627917	Alive	\N	2274646	76735256	00749c64ae6c_000_0000000039_0000519586	2040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749627977	Alive	\N	2274915	76735637	00749c64ae6c_000_0000000039_0000519586	2100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749628036	Alive	\N	2274915	76735637	00749c64ae6c_000_0000000039_0000519586	2160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749628097	Alive	\N	2440256	86199340	00749c64ae6c_000_0000000039_0000519586	2220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749628157	Alive	\N	2934121	113641125	00749c64ae6c_000_0000000039_0000519586	2280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749628217	Alive	\N	3233811	151076899	00749c64ae6c_000_0000000039_0000519586	2340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749628277	Alive	\N	3527246	172238343	00749c64ae6c_000_0000000039_0000519586	2400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749628337	Alive	\N	3815275	193770677	00749c64ae6c_000_0000000039_0000519586	2460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749628397	Alive	\N	4284662	212349050	00749c64ae6c_000_0000000039_0000519586	2520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749628417	Stop	\N	4284662	212349050	00749c64ae6c_000_0000000039_0000519586	2540	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749631830	Start	\N	\N	\N	00749c64ae6c_000_0000000040_0000525534	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749631885	Alive	\N	0	0	00749c64ae6c_000_0000000040_0000525534	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749631945	Alive	\N	41898	126987	00749c64ae6c_000_0000000040_0000525534	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632005	Alive	\N	42120	127185	00749c64ae6c_000_0000000040_0000525534	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632065	Alive	\N	42342	127251	00749c64ae6c_000_0000000040_0000525534	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632125	Alive	\N	381348	2690891	00749c64ae6c_000_0000000040_0000525534	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632185	Alive	\N	1256989	8653418	00749c64ae6c_000_0000000040_0000525534	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632245	Alive	\N	1922689	9274973	00749c64ae6c_000_0000000040_0000525534	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632305	Alive	\N	2166161	9759371	00749c64ae6c_000_0000000040_0000525534	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632365	Alive	\N	3143050	141329552	00749c64ae6c_000_0000000040_0000525534	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632425	Alive	\N	3321819	169189802	00749c64ae6c_000_0000000040_0000525534	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632485	Alive	\N	3408782	169236054	00749c64ae6c_000_0000000040_0000525534	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632545	Alive	\N	4533505	186736467	00749c64ae6c_000_0000000040_0000525534	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632605	Alive	\N	6661636	261514278	00749c64ae6c_000_0000000040_0000525534	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632665	Alive	\N	8850958	355476403	00749c64ae6c_000_0000000040_0000525534	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632725	Alive	\N	9536900	382861731	00749c64ae6c_000_0000000040_0000525534	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632784	Alive	\N	9551292	382870618	00749c64ae6c_000_0000000040_0000525534	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632845	Alive	\N	9589625	382920879	00749c64ae6c_000_0000000040_0000525534	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632905	Alive	\N	9597850	382929709	00749c64ae6c_000_0000000040_0000525534	1080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749632965	Alive	\N	9598634	382933664	00749c64ae6c_000_0000000040_0000525534	1140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633025	Alive	\N	10106247	396876726	00749c64ae6c_000_0000000040_0000525534	1200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633085	Alive	\N	10803710	424964320	00749c64ae6c_000_0000000040_0000525534	1260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633145	Alive	\N	10844620	425005636	00749c64ae6c_000_0000000040_0000525534	1320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633205	Alive	\N	10876096	425037014	00749c64ae6c_000_0000000040_0000525534	1380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633265	Alive	\N	10890358	425072275	00749c64ae6c_000_0000000040_0000525534	1440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633325	Alive	\N	10893841	425075330	00749c64ae6c_000_0000000040_0000525534	1500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633385	Alive	\N	10894769	425076649	00749c64ae6c_000_0000000040_0000525534	1560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633445	Alive	\N	10895092	425079397	00749c64ae6c_000_0000000040_0000525534	1620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633505	Alive	\N	10895092	425079397	00749c64ae6c_000_0000000040_0000525534	1680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633565	Alive	\N	10895253	425079568	00749c64ae6c_000_0000000040_0000525534	1740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633625	Alive	\N	10896000	425080104	00749c64ae6c_000_0000000040_0000525534	1800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633685	Alive	\N	11128172	425584784	00749c64ae6c_000_0000000040_0000525534	1860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633745	Alive	\N	11160833	425600553	00749c64ae6c_000_0000000040_0000525534	1920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633805	Alive	\N	11161072	425600829	00749c64ae6c_000_0000000040_0000525534	1980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633865	Alive	\N	11161547	425601335	00749c64ae6c_000_0000000040_0000525534	2040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633924	Alive	\N	11252864	425647984	00749c64ae6c_000_0000000040_0000525534	2100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749633985	Alive	\N	11275517	425700815	00749c64ae6c_000_0000000040_0000525534	2160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634045	Alive	\N	11278540	425706674	00749c64ae6c_000_0000000040_0000525534	2220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634105	Alive	\N	11345463	425765896	00749c64ae6c_000_0000000040_0000525534	2280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634165	Alive	\N	11388309	425818361	00749c64ae6c_000_0000000040_0000525534	2340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634225	Alive	\N	11388664	425818644	00749c64ae6c_000_0000000040_0000525534	2400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634285	Alive	\N	11389265	425819262	00749c64ae6c_000_0000000040_0000525534	2460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634345	Alive	\N	11389265	425819262	00749c64ae6c_000_0000000040_0000525534	2520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634405	Alive	\N	11399302	425839366	00749c64ae6c_000_0000000040_0000525534	2580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634464	Alive	\N	11436345	425901320	00749c64ae6c_000_0000000040_0000525534	2640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634525	Alive	\N	11437569	425902551	00749c64ae6c_000_0000000040_0000525534	2700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634585	Alive	\N	11438032	425905929	00749c64ae6c_000_0000000040_0000525534	2760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634645	Alive	\N	11482144	425946693	00749c64ae6c_000_0000000040_0000525534	2820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634705	Alive	\N	11970307	446032531	00749c64ae6c_000_0000000040_0000525534	2880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634765	Alive	\N	12018496	446089021	00749c64ae6c_000_0000000040_0000525534	2940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634825	Alive	\N	12018797	446089265	00749c64ae6c_000_0000000040_0000525534	3000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634885	Alive	\N	12656071	453740734	00749c64ae6c_000_0000000040_0000525534	3060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749634945	Alive	\N	12978690	474645786	00749c64ae6c_000_0000000040_0000525534	3120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749635004	Alive	\N	13287413	492632439	00749c64ae6c_000_0000000040_0000525534	3180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749635065	Alive	\N	13577946	510357203	00749c64ae6c_000_0000000040_0000525534	3240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749635125	Alive	\N	14040159	524105649	00749c64ae6c_000_0000000040_0000525534	3300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749635185	Alive	\N	14673667	537943311	00749c64ae6c_000_0000000040_0000525534	3360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749635245	Alive	\N	14975553	555174000	00749c64ae6c_000_0000000040_0000525534	3420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749635305	Alive	\N	15232768	569063406	00749c64ae6c_000_0000000040_0000525534	3480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749635365	Alive	\N	15500920	584255315	00749c64ae6c_000_0000000040_0000525534	3540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749635425	Alive	\N	15791846	599850770	00749c64ae6c_000_0000000040_0000525534	3600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749635485	Alive	\N	16115150	611106469	00749c64ae6c_000_0000000040_0000525534	3660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749636677	Start	\N	\N	\N	00749c64ae6c_000_0000000001_0000001011	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1749636678	Stop	\N	0	0	00749c64ae6c_000_0000000001_0000001011	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750125620	Start	\N	\N	\N	00749c64ae6c_000_0000000003_0000489944	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750125620	Stop	\N	0	0	00749c64ae6c_000_0000000003_0000489944	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1750126559	Start	\N	\N	\N	00749c646f48_000_0000000001_1750126558	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+limit	1750126996	Stop	\N	105839	239867	00749c646f48_000_0000000001_1750126558	437	User-Request	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+limit	1750127203	Start	\N	\N	\N	00749c646f48_000_0000000004_1750127202	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+limit	1750127323	Stop	\N	28917	18266	00749c646f48_000_0000000004_1750127202	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+limit	1750127639	Start	\N	\N	\N	00749c646f48_000_0000000007_1750127638	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+limit	1750127759	Stop	\N	32712	29271	00749c646f48_000_0000000007_1750127638	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750130500	Start	\N	\N	\N	00749c646f48_000_0000000001_1750130499	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750130620	Stop	\N	1291081	95806830	00749c646f48_000_0000000001_1750130499	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750131604	Start	\N	\N	\N	00749c64ae6c_000_0000000006_0000495939	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750131604	Stop	\N	0	0	00749c64ae6c_000_0000000006_0000495939	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750131608	Start	\N	\N	\N	00749c64ae6c_000_0000000007_0000495943	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750131608	Stop	\N	0	0	00749c64ae6c_000_0000000007_0000495943	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1750131876	Start	\N	\N	\N	00749c64ae6c_000_0000000008_0000496203	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1750131876	Stop	\N	0	0	00749c64ae6c_000_0000000008_0000496203	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1750140291	Start	\N	\N	\N	00749c64ae6c_000_0000000001_0000007875	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+limit	1750140291	Stop	\N	0	0	00749c64ae6c_000_0000000001_0000007875	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1750140469	Start	\N	\N	\N	00749c64ae6c_000_0000000002_0000008054	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1750140469	Stop	\N	0	0	00749c64ae6c_000_0000000002_0000008054	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1750140483	Start	\N	\N	\N	00749c64ae6c_000_0000000003_0000008068	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1750140483	Stop	\N	0	0	00749c64ae6c_000_0000000003_0000008068	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1750140557	Start	\N	\N	\N	00749c64ae6c_000_0000000004_0000008137	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+mca	1750140557	Stop	\N	0	0	00749c64ae6c_000_0000000004_0000008137	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750140727	Start	\N	\N	\N	00749c646f48_000_0000000004_1750140725	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750140772	Start	\N	\N	\N	00749c64ae6c_000_0000000005_0000008352	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750140772	Stop	\N	0	0	00749c64ae6c_000_0000000005_0000008352	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750140776	Start	\N	\N	\N	00749c64ae6c_000_0000000006_0000008361	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750140776	Stop	\N	0	0	00749c64ae6c_000_0000000006_0000008361	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750140796	Start	\N	\N	\N	00749c64ae6c_000_0000000007_0000008381	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750140796	Stop	\N	0	0	00749c64ae6c_000_0000000007_0000008381	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750140809	Start	\N	\N	\N	00749c64ae6c_000_0000000008_0000008394	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750140809	Stop	\N	0	0	00749c64ae6c_000_0000000008_0000008394	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750140814	Start	\N	\N	\N	00749c64ae6c_000_0000000009_0000008399	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750140814	Stop	\N	0	0	00749c64ae6c_000_0000000009_0000008399	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750140843	Stop	\N	25386	20041	00749c646f48_000_0000000004_1750140725	116	User-Request	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750140861	Start	\N	\N	\N	00749c64ae6c_000_0000000010_0000008445	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750140862	Stop	\N	0	0	00749c64ae6c_000_0000000010_0000008445	0	0	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750140921	Start	\N	\N	\N	00749c646f48_000_0000000005_1750140919	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750141042	Stop	\N	39621	29790	00749c646f48_000_0000000005_1750140919	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750141061	Start	\N	\N	\N	00749c646f48_000_0000000006_1750141059	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750141181	Stop	\N	3294	0	00749c646f48_000_0000000006_1750141059	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750141208	Start	\N	\N	\N	00749c646f48_000_0000000007_1750141206	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750141328	Stop	\N	1912	98	00749c646f48_000_0000000007_1750141206	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750141481	Start	\N	\N	\N	00749c646f48_000_0000000008_1750141480	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750141601	Stop	\N	6808	12242	00749c646f48_000_0000000008_1750141480	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750141650	Start	\N	\N	\N	00749c646f48_000_0000000009_1750141648	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750141770	Stop	\N	0	0	00749c646f48_000_0000000009_1750141648	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750142008	Start	\N	\N	\N	00749c646f48_000_0000000010_1750142006	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750142128	Stop	\N	1912	98	00749c646f48_000_0000000010_1750142006	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750142172	Start	\N	\N	\N	00749c646f48_000_0000000011_1750142171	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750142292	Stop	\N	810	990	00749c646f48_000_0000000011_1750142171	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750142656	Start	\N	\N	\N	00749c646f48_000_0000000012_1750142654	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750142776	Stop	\N	9408	9633	00749c646f48_000_0000000012_1750142654	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750142783	Start	\N	\N	\N	00749c646f48_000_0000000013_1750142782	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750142904	Stop	\N	0	0	00749c646f48_000_0000000013_1750142782	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750143047	Start	\N	\N	\N	00749c646f48_000_0000000014_1750143045	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750143167	Stop	\N	858	614	00749c646f48_000_0000000014_1750143045	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750143175	Start	\N	\N	\N	00749c646f48_000_0000000015_1750143174	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750143295	Stop	\N	0	0	00749c646f48_000_0000000015_1750143174	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750143385	Start	\N	\N	\N	00749c646f48_000_0000000016_1750143384	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750143505	Stop	\N	26780	23011	00749c646f48_000_0000000016_1750143384	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750143528	Start	\N	\N	\N	00749c646f48_000_0000000017_1750143526	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750143648	Stop	\N	0	0	00749c646f48_000_0000000017_1750143526	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750144130	Start	\N	\N	\N	00749c64ae6c_000_0000000001_0000001882	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750144190	Alive	\N	0	0	00749c64ae6c_000_0000000001_0000001882	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750144250	Alive	\N	75838	610215	00749c64ae6c_000_0000000001_0000001882	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750144310	Alive	\N	85052	631378	00749c64ae6c_000_0000000001_0000001882	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750144369	Alive	\N	88171	642022	00749c64ae6c_000_0000000001_0000001882	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750144429	Alive	\N	93461	647029	00749c64ae6c_000_0000000001_0000001882	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750144490	Alive	\N	93936	647562	00749c64ae6c_000_0000000001_0000001882	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750144490	Start	\N	\N	\N	00749c646f48_000_0000000018_1750144489	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750144553	Stop	\N	0	0	00749c646f48_000_0000000018_1750144489	63	User-Request	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750144554	Start	\N	\N	\N	00749c646f48_000_0000000019_1750144553	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750144554	Alive	\N	94396	647977	00749c64ae6c_000_0000000001_0000001882	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750144610	Alive	\N	95040	650513	00749c64ae6c_000_0000000001_0000001882	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750144670	Alive	\N	95321	651912	00749c64ae6c_000_0000000001_0000001882	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750144674	Stop	\N	286724	2187948	00749c646f48_000_0000000019_1750144553	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750144702	Stop	\N	170496	845633	00749c64ae6c_000_0000000001_0000001882	572	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750144705	Start	\N	\N	\N	00749c646f48_000_0000000020_1750144703	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750144757	Start	\N	\N	\N	00749c64ae6c_000_0000000002_0000002509	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750144818	Alive	\N	0	0	00749c64ae6c_000_0000000002_0000002509	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750144825	Stop	\N	2154	834	00749c646f48_000_0000000020_1750144703	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750144877	Alive	\N	33067	47677	00749c64ae6c_000_0000000002_0000002509	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750144922	Start	\N	\N	\N	00749c646f48_000_0000000021_1750144920	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750144937	Alive	\N	33294	48975	00749c64ae6c_000_0000000002_0000002509	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750144998	Alive	\N	33547	49325	00749c64ae6c_000_0000000002_0000002509	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750145042	Stop	\N	1464	0	00749c646f48_000_0000000021_1750144920	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750145050	Start	\N	\N	\N	00749c646f48_000_0000000022_1750145048	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750145058	Alive	\N	33796	49753	00749c64ae6c_000_0000000002_0000002509	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750145118	Alive	\N	35404	51449	00749c64ae6c_000_0000000002_0000002509	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750145170	Stop	\N	432	1133	00749c646f48_000_0000000022_1750145048	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750145178	Alive	\N	35404	51449	00749c64ae6c_000_0000000002_0000002509	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750145188	Start	\N	\N	\N	00749c646f48_000_0000000023_1750145186	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750145238	Alive	\N	35499	51620	00749c64ae6c_000_0000000002_0000002509	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750145298	Alive	\N	35499	51620	00749c64ae6c_000_0000000002_0000002509	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750145308	Stop	\N	1912	1349	00749c646f48_000_0000000023_1750145186	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750145312	Start	\N	\N	\N	00749c646f48_000_0000000024_1750145310	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750145358	Alive	\N	35499	51620	00749c64ae6c_000_0000000002_0000002509	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750145417	Alive	\N	35961	52081	00749c64ae6c_000_0000000002_0000002509	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750145432	Stop	\N	0	0	00749c646f48_000_0000000024_1750145310	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750145477	Alive	\N	36131	53012	00749c64ae6c_000_0000000002_0000002509	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750145537	Alive	\N	189052	119269	00749c64ae6c_000_0000000002_0000002509	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750145598	Alive	\N	189366	119604	00749c64ae6c_000_0000000002_0000002509	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750145658	Alive	\N	189366	119604	00749c64ae6c_000_0000000002_0000002509	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750145715	Start	\N	\N	\N	00749c646f48_000_0000000025_1750145713	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750145718	Alive	\N	189814	120085	00749c64ae6c_000_0000000002_0000002509	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750145778	Alive	\N	189814	120085	00749c64ae6c_000_0000000002_0000002509	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750145835	Stop	\N	858	614	00749c646f48_000_0000000025_1750145713	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750145838	Alive	\N	490749	5705884	00749c64ae6c_000_0000000002_0000002509	1080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750145843	Start	\N	\N	\N	00749c646f48_000_0000000026_1750145841	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750145898	Alive	\N	553667	8484478	00749c64ae6c_000_0000000002_0000002509	1140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750145957	Alive	\N	553721	8484591	00749c64ae6c_000_0000000002_0000002509	1200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750145963	Stop	\N	0	0	00749c646f48_000_0000000026_1750145841	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750146017	Alive	\N	556598	8487303	00749c64ae6c_000_0000000002_0000002509	1260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750146077	Alive	\N	556693	8487474	00749c64ae6c_000_0000000002_0000002509	1320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750146138	Alive	\N	557464	8489176	00749c64ae6c_000_0000000002_0000002509	1380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750146198	Alive	\N	557518	8489281	00749c64ae6c_000_0000000002_0000002509	1440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750146258	Alive	\N	557518	8489281	00749c64ae6c_000_0000000002_0000002509	1500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750146287	Start	\N	\N	\N	00749c646f48_000_0000000027_1750146285	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750146318	Alive	\N	558296	8490632	00749c64ae6c_000_0000000002_0000002509	1560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750146378	Alive	\N	747335	9169078	00749c64ae6c_000_0000000002_0000002509	1620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750146407	Stop	\N	8212	8364	00749c646f48_000_0000000027_1750146285	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750146409	Start	\N	\N	\N	00749c646f48_000_0000000028_1750146407	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750146438	Alive	\N	1047291	11339107	00749c64ae6c_000_0000000002_0000002509	1680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750146497	Alive	\N	1057955	11362889	00749c64ae6c_000_0000000002_0000002509	1740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750146529	Stop	\N	0	0	00749c646f48_000_0000000028_1750146407	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750146557	Alive	\N	1058636	11363693	00749c64ae6c_000_0000000002_0000002509	1800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750146617	Alive	\N	1101951	11428452	00749c64ae6c_000_0000000002_0000002509	1860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750146678	Alive	\N	1106761	11434161	00749c64ae6c_000_0000000002_0000002509	1920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750146738	Alive	\N	1407135	27091873	00749c64ae6c_000_0000000002_0000002509	1980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750146745	Start	\N	\N	\N	00749c646f48_000_0000000029_1750146743	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750146798	Alive	\N	1480294	27296229	00749c64ae6c_000_0000000002_0000002509	2040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750146858	Alive	\N	1480348	27296330	00749c64ae6c_000_0000000002_0000002509	2100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750146865	Stop	\N	2062	7642	00749c646f48_000_0000000029_1750146743	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750146882	Start	\N	\N	\N	00749c646f48_000_0000000030_1750146880	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750146918	Alive	\N	1523851	27401882	00749c64ae6c_000_0000000002_0000002509	2160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750146978	Alive	\N	1524163	27402309	00749c64ae6c_000_0000000002_0000002509	2220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750147002	Stop	\N	0	0	00749c646f48_000_0000000030_1750146880	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750147026	Start	\N	\N	\N	00749c646f48_000_0000000031_1750147024	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750147037	Alive	\N	1524614	27404906	00749c64ae6c_000_0000000002_0000002509	2280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750147097	Alive	\N	1524668	27405011	00749c64ae6c_000_0000000002_0000002509	2340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750147146	Stop	\N	25790	18504	00749c646f48_000_0000000031_1750147024	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750147154	Start	\N	\N	\N	00749c646f48_000_0000000032_1750147152	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750147158	Alive	\N	1524722	27405077	00749c64ae6c_000_0000000002_0000002509	2400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750147218	Alive	\N	1525407	27405851	00749c64ae6c_000_0000000002_0000002509	2460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750147274	Stop	\N	0	0	00749c646f48_000_0000000032_1750147152	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750147278	Alive	\N	1525461	27406041	00749c64ae6c_000_0000000002_0000002509	2520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750147338	Alive	\N	1532718	27411586	00749c64ae6c_000_0000000002_0000002509	2580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750147372	Start	\N	\N	\N	00749c646f48_000_0000000033_1750147370	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750147398	Alive	\N	1532826	27411792	00749c64ae6c_000_0000000002_0000002509	2640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750147458	Alive	\N	1532826	27411792	00749c64ae6c_000_0000000002_0000002509	2700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750147492	Stop	\N	5231	6863	00749c646f48_000_0000000033_1750147370	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750147494	Start	\N	\N	\N	00749c646f48_000_0000000034_1750147493	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750147517	Alive	\N	1537758	27421363	00749c64ae6c_000_0000000002_0000002509	2760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750147577	Alive	\N	1537959	27421697	00749c64ae6c_000_0000000002_0000002509	2820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750147614	Stop	\N	468	180	00749c646f48_000_0000000034_1750147493	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750147619	Start	\N	\N	\N	00749c646f48_000_0000000035_1750147617	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750147637	Alive	\N	1538135	27421997	00749c64ae6c_000_0000000002_0000002509	2880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750147698	Alive	\N	1538189	27422115	00749c64ae6c_000_0000000002_0000002509	2940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750147739	Stop	\N	222	126	00749c646f48_000_0000000035_1750147617	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750147758	Alive	\N	1538359	27423028	00749c64ae6c_000_0000000002_0000002509	3000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750147761	Start	\N	\N	\N	00749c646f48_000_0000000036_1750147760	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750147818	Alive	\N	1538966	27423684	00749c64ae6c_000_0000000002_0000002509	3060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750147878	Alive	\N	1538966	27423684	00749c64ae6c_000_0000000002_0000002509	3120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750147881	Stop	\N	630	0	00749c646f48_000_0000000036_1750147760	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750147938	Alive	\N	1539597	27424601	00749c64ae6c_000_0000000002_0000002509	3180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750147939	Start	\N	\N	\N	00749c646f48_000_0000000037_1750147937	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750147998	Alive	\N	1539676	27424744	00749c64ae6c_000_0000000002_0000002509	3240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750148057	Alive	\N	1539757	27424873	00749c64ae6c_000_0000000002_0000002509	3300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750148058	Stop	\N	12817	12136	00749c646f48_000_0000000037_1750147937	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750148065	Start	\N	\N	\N	00749c646f48_000_0000000038_1750148063	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750148117	Alive	\N	1727122	27563451	00749c64ae6c_000_0000000002_0000002509	3360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750148177	Alive	\N	1782453	27618296	00749c64ae6c_000_0000000002_0000002509	3420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750148185	Stop	\N	0	0	00749c646f48_000_0000000038_1750148063	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750148242	Alive	\N	1788149	27624777	00749c64ae6c_000_0000000002_0000002509	3480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750148298	Alive	\N	2171458	30054609	00749c64ae6c_000_0000000002_0000002509	3540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750148358	Alive	\N	5853611	42080306	00749c64ae6c_000_0000000002_0000002509	3600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750148418	Alive	\N	6389063	42747528	00749c64ae6c_000_0000000002_0000002509	3660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750148478	Alive	\N	6389224	42747699	00749c64ae6c_000_0000000002_0000002509	3720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750148521	Start	\N	\N	\N	00749c646f48_000_0000000039_1750148519	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750148538	Alive	\N	6389777	42748365	00749c64ae6c_000_0000000002_0000002509	3780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750148597	Alive	\N	6389777	42748365	00749c64ae6c_000_0000000002_0000002509	3840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750148641	Stop	\N	8242	7935	00749c646f48_000_0000000039_1750148519	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750148657	Alive	\N	6389938	42748536	00749c64ae6c_000_0000000002_0000002509	3900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750148659	Start	\N	\N	\N	00749c646f48_000_0000000040_1750148657	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750148717	Alive	\N	6406585	42779091	00749c64ae6c_000_0000000002_0000002509	3960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750148778	Alive	\N	6406814	42779277	00749c64ae6c_000_0000000002_0000002509	4020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750148779	Stop	\N	0	0	00749c646f48_000_0000000040_1750148657	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750148797	Start	\N	\N	\N	00749c646f48_000_0000000041_1750148795	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750148838	Alive	\N	6406814	42779277	00749c64ae6c_000_0000000002_0000002509	4080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750148898	Alive	\N	6406814	42779277	00749c64ae6c_000_0000000002_0000002509	4140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750148917	Stop	\N	1044	752	00749c646f48_000_0000000041_1750148795	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750148925	Start	\N	\N	\N	00749c646f48_000_0000000042_1750148923	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750148958	Alive	\N	6510520	42992017	00749c64ae6c_000_0000000002_0000002509	4200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750149018	Alive	\N	6514636	42998089	00749c64ae6c_000_0000000002_0000002509	4260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750149045	Stop	\N	0	0	00749c646f48_000_0000000042_1750148923	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750149078	Alive	\N	6514799	42998275	00749c64ae6c_000_0000000002_0000002509	4320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750149137	Alive	\N	6514799	42998275	00749c64ae6c_000_0000000002_0000002509	4380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750149197	Alive	\N	6515956	43004146	00749c64ae6c_000_0000000002_0000002509	4440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750149257	Alive	\N	6516197	43004398	00749c64ae6c_000_0000000002_0000002509	4500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750149318	Alive	\N	6516498	43004576	00749c64ae6c_000_0000000002_0000002509	4560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750149378	Alive	\N	6516498	43004576	00749c64ae6c_000_0000000002_0000002509	4620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750149438	Alive	\N	6776632	43853053	00749c64ae6c_000_0000000002_0000002509	4680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750149498	Alive	\N	7310081	47891995	00749c64ae6c_000_0000000002_0000002509	4740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750149558	Alive	\N	7336846	47929510	00749c64ae6c_000_0000000002_0000002509	4800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750149572	Start	\N	\N	\N	00749c646f48_000_0000000043_1750149570	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750149618	Alive	\N	7790461	51107514	00749c64ae6c_000_0000000002_0000002509	4860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750149677	Alive	\N	7806698	51726008	00749c64ae6c_000_0000000002_0000002509	4920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750149692	Stop	\N	4023	37894	00749c646f48_000_0000000043_1750149570	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750149694	Start	\N	\N	\N	00749c646f48_000_0000000044_1750149692	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750149737	Alive	\N	7816820	51752766	00749c64ae6c_000_0000000002_0000002509	4980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750149797	Alive	\N	8089502	51774120	00749c64ae6c_000_0000000002_0000002509	5040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750149814	Stop	\N	0	0	00749c646f48_000_0000000044_1750149692	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750149858	Alive	\N	8089838	51774543	00749c64ae6c_000_0000000002_0000002509	5100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750149918	Alive	\N	8091829	51777040	00749c64ae6c_000_0000000002_0000002509	5160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750149978	Alive	\N	8136376	51958357	00749c64ae6c_000_0000000002_0000002509	5220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750150038	Alive	\N	8136754	51958832	00749c64ae6c_000_0000000002_0000002509	5280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750150098	Alive	\N	8137494	51959596	00749c64ae6c_000_0000000002_0000002509	5340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750150158	Alive	\N	8138495	51965467	00749c64ae6c_000_0000000002_0000002509	5400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750150185	Start	\N	\N	\N	00749c646f48_000_0000000045_1750150183	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750150217	Alive	\N	8184769	52132016	00749c64ae6c_000_0000000002_0000002509	5460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750150277	Alive	\N	8185692	52133864	00749c64ae6c_000_0000000002_0000002509	5520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750150305	Stop	\N	14720	17988	00749c646f48_000_0000000045_1750150183	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750150318	Start	\N	\N	\N	00749c646f48_000_0000000046_1750150316	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750150338	Alive	\N	8185933	52135135	00749c64ae6c_000_0000000002_0000002509	5580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750150398	Alive	\N	8270999	52291572	00749c64ae6c_000_0000000002_0000002509	5640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750150438	Stop	\N	9957	104814	00749c646f48_000_0000000046_1750150316	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750150458	Alive	\N	8304190	52315157	00749c64ae6c_000_0000000002_0000002509	5700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750150491	Start	\N	\N	\N	00749c646f48_000_0000000047_1750150489	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750150523	Alive	\N	8304730	52315713	00749c64ae6c_000_0000000002_0000002509	5760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750150578	Alive	\N	8343309	52357160	00749c64ae6c_000_0000000002_0000002509	5820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750150611	Stop	\N	198	132	00749c646f48_000_0000000047_1750150489	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750150628	Start	\N	\N	\N	00749c646f48_000_0000000048_1750150626	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750150638	Alive	\N	8484681	52613707	00749c64ae6c_000_0000000002_0000002509	5880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750150698	Alive	\N	8557043	52752782	00749c64ae6c_000_0000000002_0000002509	5940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750150748	Stop	\N	266845	3906146	00749c646f48_000_0000000048_1750150626	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750150750	Start	\N	\N	\N	00749c646f48_000_0000000049_1750150748	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750150757	Alive	\N	8557776	52753717	00749c64ae6c_000_0000000002_0000002509	6000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750150817	Alive	\N	8562549	52758127	00749c64ae6c_000_0000000002_0000002509	6060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750150870	Stop	\N	817409	8021113	00749c646f48_000_0000000049_1750150748	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750150872	Start	\N	\N	\N	00749c646f48_000_0000000050_1750150870	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750150878	Alive	\N	8619552	52817639	00749c64ae6c_000_0000000002_0000002509	6120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750150938	Alive	\N	8657027	52970790	00749c64ae6c_000_0000000002_0000002509	6180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750150992	Stop	\N	0	0	00749c646f48_000_0000000050_1750150870	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750150998	Alive	\N	9051557	54266551	00749c64ae6c_000_0000000002_0000002509	6240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750151058	Alive	\N	9251479	54622849	00749c64ae6c_000_0000000002_0000002509	6300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750151065	Start	\N	\N	\N	00749c646f48_000_0000000051_1750151063	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750151118	Alive	\N	9415658	54831697	00749c64ae6c_000_0000000002_0000002509	6360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750151178	Alive	\N	9419694	54839624	00749c64ae6c_000_0000000002_0000002509	6420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750151185	Stop	\N	0	0	00749c646f48_000_0000000051_1750151063	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750151204	Start	\N	\N	\N	00749c646f48_000_0000000052_1750151202	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750151237	Alive	\N	9688227	55274601	00749c64ae6c_000_0000000002_0000002509	6480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750151297	Alive	\N	9761770	55412363	00749c64ae6c_000_0000000002_0000002509	6540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750151324	Stop	\N	0	0	00749c646f48_000_0000000052_1750151202	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750151357	Alive	\N	9774088	55424778	00749c64ae6c_000_0000000002_0000002509	6600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750151418	Alive	\N	9782415	55436638	00749c64ae6c_000_0000000002_0000002509	6660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750151478	Alive	\N	9787733	55442312	00749c64ae6c_000_0000000002_0000002509	6720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750151508	Start	\N	\N	\N	00749c646f48_000_0000000053_1750151506	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750151538	Alive	\N	9796415	55460177	00749c64ae6c_000_0000000002_0000002509	6780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750151598	Alive	\N	9854598	55488642	00749c64ae6c_000_0000000002_0000002509	6840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750151628	Stop	\N	8440	9498	00749c646f48_000_0000000053_1750151506	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750151638	Start	\N	\N	\N	00749c646f48_000_0000000054_1750151636	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750151658	Alive	\N	9875810	55516707	00749c64ae6c_000_0000000002_0000002509	6900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750151718	Alive	\N	9909521	55587028	00749c64ae6c_000_0000000002_0000002509	6960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750151759	Stop	\N	0	0	00749c646f48_000_0000000054_1750151636	121	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750151778	Alive	\N	9913370	55593249	00749c64ae6c_000_0000000002_0000002509	7020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750151837	Alive	\N	9915916	55595529	00749c64ae6c_000_0000000002_0000002509	7080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750151897	Alive	\N	9933762	55618179	00749c64ae6c_000_0000000002_0000002509	7140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750151958	Alive	\N	9971409	55664222	00749c64ae6c_000_0000000002_0000002509	7200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750152018	Alive	\N	10394983	60919312	00749c64ae6c_000_0000000002_0000002509	7260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750152078	Alive	\N	11208237	74266446	00749c64ae6c_000_0000000002_0000002509	7320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750152092	Start	\N	\N	\N	00749c646f48_000_0000000055_1750152090	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750152138	Alive	\N	12618309	144205777	00749c64ae6c_000_0000000002_0000002509	7380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750152198	Alive	\N	14268639	286111230	00749c64ae6c_000_0000000002_0000002509	7440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750152212	Stop	\N	1130	6049	00749c646f48_000_0000000055_1750152090	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750152233	Start	\N	\N	\N	00749c646f48_000_0000000056_1750152231	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750152258	Alive	\N	15172544	306998865	00749c64ae6c_000_0000000002_0000002509	7500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750152317	Alive	\N	15943721	323759427	00749c64ae6c_000_0000000002_0000002509	7560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750152353	Stop	\N	13101	12142	00749c646f48_000_0000000056_1750152231	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750152377	Alive	\N	17335709	464681315	00749c64ae6c_000_0000000002_0000002509	7620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750152383	Start	\N	\N	\N	00749c646f48_000_0000000057_1750152381	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750152438	Alive	\N	18073546	548129060	00749c64ae6c_000_0000000002_0000002509	7680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750152498	Alive	\N	18529174	551885956	00749c64ae6c_000_0000000002_0000002509	7740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750152503	Stop	\N	298860	4103149	00749c646f48_000_0000000057_1750152381	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750152504	Start	\N	\N	\N	00749c646f48_000_0000000058_1750152503	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750152558	Alive	\N	19142503	564868934	00749c64ae6c_000_0000000002_0000002509	7800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750152618	Alive	\N	19669501	584641202	00749c64ae6c_000_0000000002_0000002509	7860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750152624	Stop	\N	96906	2835097	00749c646f48_000_0000000058_1750152503	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750152657	Start	\N	\N	\N	00749c646f48_000_0000000059_1750152651	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750152678	Alive	\N	19879398	585038669	00749c64ae6c_000_0000000002_0000002509	7920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750152738	Alive	\N	20667457	585283540	00749c64ae6c_000_0000000002_0000002509	7980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750152777	Stop	\N	160666	374251	00749c646f48_000_0000000059_1750152651	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750152795	Start	\N	\N	\N	00749c646f48_000_0000000060_1750152794	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750152797	Alive	\N	20671916	585288668	00749c64ae6c_000_0000000002_0000002509	8040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750152857	Alive	\N	20703230	585308457	00749c64ae6c_000_0000000002_0000002509	8100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750152915	Stop	\N	774	1089	00749c646f48_000_0000000060_1750152794	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750152917	Alive	\N	20771823	585954708	00749c64ae6c_000_0000000002_0000002509	8160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750152929	Start	\N	\N	\N	00749c646f48_000_0000000061_1750152927	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750152978	Alive	\N	20776938	585959995	00749c64ae6c_000_0000000002_0000002509	8220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750153038	Alive	\N	20784691	585976904	00749c64ae6c_000_0000000002_0000002509	8280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750153049	Stop	\N	866	1839	00749c646f48_000_0000000061_1750152927	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750153079	Start	\N	\N	\N	00749c646f48_000_0000000062_1750153078	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750153098	Alive	\N	20886584	586030244	00749c64ae6c_000_0000000002_0000002509	8340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750153158	Alive	\N	20900707	586047423	00749c64ae6c_000_0000000002_0000002509	8400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750153199	Stop	\N	1060	6047	00749c646f48_000_0000000062_1750153078	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750153218	Alive	\N	21033786	586114410	00749c64ae6c_000_0000000002_0000002509	8460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750153278	Alive	\N	21065092	586139340	00749c64ae6c_000_0000000002_0000002509	8520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750153337	Alive	\N	21093085	586169289	00749c64ae6c_000_0000000002_0000002509	8580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750153397	Alive	\N	21097245	586172305	00749c64ae6c_000_0000000002_0000002509	8640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750153457	Alive	\N	21098319	586173639	00749c64ae6c_000_0000000002_0000002509	8700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750153518	Alive	\N	21102542	586178507	00749c64ae6c_000_0000000002_0000002509	8760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750153578	Alive	\N	21103177	586179342	00749c64ae6c_000_0000000002_0000002509	8820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750153628	Start	\N	\N	\N	00749c646f48_000_0000000063_1750153626	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750153638	Alive	\N	21143371	586192256	00749c64ae6c_000_0000000002_0000002509	8880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750153698	Alive	\N	21143466	586192427	00749c64ae6c_000_0000000002_0000002509	8940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750153748	Stop	\N	540266	5949200	00749c646f48_000_0000000063_1750153626	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750153758	Alive	\N	21144034	586193081	00749c64ae6c_000_0000000002_0000002509	9000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750153771	Start	\N	\N	\N	00749c646f48_000_0000000064_1750153770	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750153818	Alive	\N	21146284	586198464	00749c64ae6c_000_0000000002_0000002509	9060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750153877	Alive	\N	21161926	586224800	00749c64ae6c_000_0000000002_0000002509	9120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750153891	Stop	\N	1838	1535	00749c646f48_000_0000000064_1750153770	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750153931	Start	\N	\N	\N	00749c646f48_000_0000000065_1750153930	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750153937	Alive	\N	21172992	586237350	00749c64ae6c_000_0000000002_0000002509	9180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750153997	Alive	\N	21199912	586243992	00749c64ae6c_000_0000000002_0000002509	9240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750154051	Stop	\N	2352	441	00749c646f48_000_0000000065_1750153930	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750154058	Alive	\N	21200073	586244229	00749c64ae6c_000_0000000002_0000002509	9300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750154065	Start	\N	\N	\N	00749c646f48_000_0000000066_1750154064	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750154118	Alive	\N	21218479	586260999	00749c64ae6c_000_0000000002_0000002509	9360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750154178	Alive	\N	21283477	586402551	00749c64ae6c_000_0000000002_0000002509	9420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750154185	Stop	\N	0	0	00749c646f48_000_0000000066_1750154064	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750154189	Start	\N	\N	\N	00749c646f48_000_0000000067_1750154188	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750154238	Alive	\N	21296182	586420941	00749c64ae6c_000_0000000002_0000002509	9480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750154298	Alive	\N	21306401	586434786	00749c64ae6c_000_0000000002_0000002509	9540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750154309	Stop	\N	56950	104042	00749c646f48_000_0000000067_1750154188	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750154316	Start	\N	\N	\N	00749c646f48_000_0000000068_1750154315	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750154358	Alive	\N	21306559	586434965	00749c64ae6c_000_0000000002_0000002509	9600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750154417	Alive	\N	21312336	586445335	00749c64ae6c_000_0000000002_0000002509	9660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750154436	Stop	\N	0	0	00749c646f48_000_0000000068_1750154315	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750154477	Alive	\N	21325307	586460127	00749c64ae6c_000_0000000002_0000002509	9720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750154491	Start	\N	\N	\N	00749c646f48_000_0000000069_1750154490	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750154537	Alive	\N	21325502	586460318	00749c64ae6c_000_0000000002_0000002509	9780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750154598	Alive	\N	21325663	586460489	00749c64ae6c_000_0000000002_0000002509	9840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750154611	Stop	\N	61945	15740	00749c646f48_000_0000000069_1750154490	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750154627	Start	\N	\N	\N	00749c646f48_000_0000000070_1750154626	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750154658	Alive	\N	21325663	586460489	00749c64ae6c_000_0000000002_0000002509	9900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750154718	Alive	\N	21326714	586462071	00749c64ae6c_000_0000000002_0000002509	9960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750154747	Stop	\N	0	0	00749c646f48_000_0000000070_1750154626	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750154778	Alive	\N	21361364	586504570	00749c64ae6c_000_0000000002_0000002509	10020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750154838	Alive	\N	21367332	586512518	00749c64ae6c_000_0000000002_0000002509	10080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750154898	Alive	\N	21397194	586546482	00749c64ae6c_000_0000000002_0000002509	10140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750154957	Alive	\N	21397607	586547025	00749c64ae6c_000_0000000002_0000002509	10200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750155017	Alive	\N	21399200	586548876	00749c64ae6c_000_0000000002_0000002509	10260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750155032	Start	\N	\N	\N	00749c646f48_000_0000000071_1750155031	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750155077	Alive	\N	21411756	586564546	00749c64ae6c_000_0000000002_0000002509	10320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750155138	Alive	\N	21526089	586631259	00749c64ae6c_000_0000000002_0000002509	10380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750155152	Stop	\N	40011	39136	00749c646f48_000_0000000071_1750155031	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750155198	Alive	\N	21526089	586631259	00749c64ae6c_000_0000000002_0000002509	10440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750155258	Alive	\N	21526089	586631259	00749c64ae6c_000_0000000002_0000002509	10500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750155318	Alive	\N	21526089	586631259	00749c64ae6c_000_0000000002_0000002509	10560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750155378	Alive	\N	21526089	586631259	00749c64ae6c_000_0000000002_0000002509	10620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750155407	Stop	\N	21526089	586631259	00749c64ae6c_000_0000000002_0000002509	10649	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750207884	Start	\N	\N	\N	00749c64ae6c_000_0000000003_0000065636	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750207943	Alive	\N	0	0	00749c64ae6c_000_0000000003_0000065636	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208004	Alive	\N	891510	3268805	00749c64ae6c_000_0000000003_0000065636	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208064	Alive	\N	900775	3285296	00749c64ae6c_000_0000000003_0000065636	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208124	Alive	\N	906184	3289325	00749c64ae6c_000_0000000003_0000065636	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208184	Alive	\N	906504	3289786	00749c64ae6c_000_0000000003_0000065636	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208244	Alive	\N	1279597	3313715	00749c64ae6c_000_0000000003_0000065636	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208304	Alive	\N	2078999	3324008	00749c64ae6c_000_0000000003_0000065636	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208364	Alive	\N	2454042	3888359	00749c64ae6c_000_0000000003_0000065636	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208424	Alive	\N	2527835	4048925	00749c64ae6c_000_0000000003_0000065636	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208483	Alive	\N	2550263	4081536	00749c64ae6c_000_0000000003_0000065636	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208544	Alive	\N	2563707	4251335	00749c64ae6c_000_0000000003_0000065636	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208604	Alive	\N	2567033	4255450	00749c64ae6c_000_0000000003_0000065636	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208664	Alive	\N	2578616	4268509	00749c64ae6c_000_0000000003_0000065636	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208724	Alive	\N	2582359	4273305	00749c64ae6c_000_0000000003_0000065636	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208784	Alive	\N	2585675	4280221	00749c64ae6c_000_0000000003_0000065636	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208844	Alive	\N	2587316	4283711	00749c64ae6c_000_0000000003_0000065636	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208904	Alive	\N	2590657	4287117	00749c64ae6c_000_0000000003_0000065636	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750208964	Alive	\N	2591327	4287598	00749c64ae6c_000_0000000003_0000065636	1080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209023	Alive	\N	2624242	4327154	00749c64ae6c_000_0000000003_0000065636	1140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209084	Alive	\N	2624482	4327564	00749c64ae6c_000_0000000003_0000065636	1200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209144	Alive	\N	2631248	4335691	00749c64ae6c_000_0000000003_0000065636	1260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209204	Alive	\N	2631463	4336291	00749c64ae6c_000_0000000003_0000065636	1320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209264	Alive	\N	2636389	4343062	00749c64ae6c_000_0000000003_0000065636	1380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209324	Alive	\N	2641669	4362287	00749c64ae6c_000_0000000003_0000065636	1440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209384	Alive	\N	2642209	4362947	00749c64ae6c_000_0000000003_0000065636	1500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209444	Alive	\N	2642367	4363126	00749c64ae6c_000_0000000003_0000065636	1560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209504	Alive	\N	2642462	4363297	00749c64ae6c_000_0000000003_0000065636	1620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209563	Alive	\N	2642686	4364619	00749c64ae6c_000_0000000003_0000065636	1680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209624	Alive	\N	2683492	4372463	00749c64ae6c_000_0000000003_0000065636	1740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209684	Alive	\N	2683572	4372641	00749c64ae6c_000_0000000003_0000065636	1800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209744	Alive	\N	2684490	4375099	00749c64ae6c_000_0000000003_0000065636	1860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209809	Alive	\N	2688007	4386558	00749c64ae6c_000_0000000003_0000065636	1920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209864	Alive	\N	2688099	4386737	00749c64ae6c_000_0000000003_0000065636	1980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209924	Alive	\N	2688811	4387374	00749c64ae6c_000_0000000003_0000065636	2040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750209984	Alive	\N	2688811	4387374	00749c64ae6c_000_0000000003_0000065636	2100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210044	Alive	\N	2688811	4387374	00749c64ae6c_000_0000000003_0000065636	2160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210103	Alive	\N	2689076	4388411	00749c64ae6c_000_0000000003_0000065636	2220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210164	Alive	\N	2689076	4388411	00749c64ae6c_000_0000000003_0000065636	2280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210224	Alive	\N	2689602	4388938	00749c64ae6c_000_0000000003_0000065636	2340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210284	Alive	\N	2689602	4388938	00749c64ae6c_000_0000000003_0000065636	2400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210344	Alive	\N	2705317	4411058	00749c64ae6c_000_0000000003_0000065636	2460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210404	Alive	\N	2705478	4411229	00749c64ae6c_000_0000000003_0000065636	2520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210464	Alive	\N	2705478	4411229	00749c64ae6c_000_0000000003_0000065636	2580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210524	Alive	\N	2705992	4412177	00749c64ae6c_000_0000000003_0000065636	2640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210584	Alive	\N	2714566	4435205	00749c64ae6c_000_0000000003_0000065636	2700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210643	Alive	\N	2743905	4579990	00749c64ae6c_000_0000000003_0000065636	2760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210704	Alive	\N	2745097	4582303	00749c64ae6c_000_0000000003_0000065636	2820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210764	Alive	\N	2745570	4583097	00749c64ae6c_000_0000000003_0000065636	2880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210824	Alive	\N	2774323	4899726	00749c64ae6c_000_0000000003_0000065636	2940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210884	Alive	\N	2824257	5462926	00749c64ae6c_000_0000000003_0000065636	3000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750210944	Alive	\N	3019659	8426395	00749c64ae6c_000_0000000003_0000065636	3060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211004	Alive	\N	3570128	24523473	00749c64ae6c_000_0000000003_0000065636	3120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211064	Alive	\N	4035021	29511997	00749c64ae6c_000_0000000003_0000065636	3180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211123	Alive	\N	4082178	30098618	00749c64ae6c_000_0000000003_0000065636	3240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211183	Alive	\N	4320065	40073251	00749c64ae6c_000_0000000003_0000065636	3300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211244	Alive	\N	4324957	40082700	00749c64ae6c_000_0000000003_0000065636	3360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211304	Alive	\N	4333747	40092208	00749c64ae6c_000_0000000003_0000065636	3420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211364	Alive	\N	4336203	40099502	00749c64ae6c_000_0000000003_0000065636	3480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211424	Alive	\N	4337332	40102094	00749c64ae6c_000_0000000003_0000065636	3540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211484	Alive	\N	4337676	40104625	00749c64ae6c_000_0000000003_0000065636	3600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211544	Alive	\N	4337676	40104625	00749c64ae6c_000_0000000003_0000065636	3660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211604	Alive	\N	4337676	40104625	00749c64ae6c_000_0000000003_0000065636	3720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211663	Alive	\N	4337676	40104625	00749c64ae6c_000_0000000003_0000065636	3780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211723	Alive	\N	4337975	40104869	00749c64ae6c_000_0000000003_0000065636	3840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211784	Alive	\N	4423621	40255752	00749c64ae6c_000_0000000003_0000065636	3900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211844	Alive	\N	4522894	42431856	00749c64ae6c_000_0000000003_0000065636	3960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211904	Alive	\N	4659618	46781982	00749c64ae6c_000_0000000003_0000065636	4020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750211964	Alive	\N	4776476	47205980	00749c64ae6c_000_0000000003_0000065636	4080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212024	Alive	\N	4899424	47616001	00749c64ae6c_000_0000000003_0000065636	4140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212084	Alive	\N	5176990	47896090	00749c64ae6c_000_0000000003_0000065636	4200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212144	Alive	\N	5204543	48577217	00749c64ae6c_000_0000000003_0000065636	4260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212203	Alive	\N	5236693	48750289	00749c64ae6c_000_0000000003_0000065636	4320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212263	Alive	\N	5265799	48791338	00749c64ae6c_000_0000000003_0000065636	4380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212324	Alive	\N	5293763	48961279	00749c64ae6c_000_0000000003_0000065636	4440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212384	Alive	\N	5313750	48978257	00749c64ae6c_000_0000000003_0000065636	4500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212444	Alive	\N	5318642	48987906	00749c64ae6c_000_0000000003_0000065636	4560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212504	Alive	\N	5323442	48995261	00749c64ae6c_000_0000000003_0000065636	4620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212564	Alive	\N	5366868	49435708	00749c64ae6c_000_0000000003_0000065636	4680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212624	Alive	\N	5407128	49525073	00749c64ae6c_000_0000000003_0000065636	4740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212684	Alive	\N	5436507	50405945	00749c64ae6c_000_0000000003_0000065636	4800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212743	Alive	\N	5461146	50437434	00749c64ae6c_000_0000000003_0000065636	4860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212804	Alive	\N	5498329	50493216	00749c64ae6c_000_0000000003_0000065636	4920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212864	Alive	\N	5515841	50510317	00749c64ae6c_000_0000000003_0000065636	4980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212924	Alive	\N	5526398	50520854	00749c64ae6c_000_0000000003_0000065636	5040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750212984	Alive	\N	5538397	50544517	00749c64ae6c_000_0000000003_0000065636	5100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213044	Alive	\N	5539269	50545158	00749c64ae6c_000_0000000003_0000065636	5160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213104	Alive	\N	5546374	50565227	00749c64ae6c_000_0000000003_0000065636	5220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213164	Alive	\N	5547658	50567619	00749c64ae6c_000_0000000003_0000065636	5280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213224	Alive	\N	5548235	50569280	00749c64ae6c_000_0000000003_0000065636	5340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213283	Alive	\N	5548235	50569280	00749c64ae6c_000_0000000003_0000065636	5400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213344	Alive	\N	5548289	50569393	00749c64ae6c_000_0000000003_0000065636	5460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213404	Alive	\N	5548289	50569393	00749c64ae6c_000_0000000003_0000065636	5520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213464	Alive	\N	5556316	50579423	00749c64ae6c_000_0000000003_0000065636	5580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213524	Alive	\N	5557090	50581449	00749c64ae6c_000_0000000003_0000065636	5640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213584	Alive	\N	5563195	50598295	00749c64ae6c_000_0000000003_0000065636	5700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213644	Alive	\N	5563195	50598295	00749c64ae6c_000_0000000003_0000065636	5760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213704	Alive	\N	5563411	50598737	00749c64ae6c_000_0000000003_0000065636	5820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213763	Alive	\N	5563767	50599018	00749c64ae6c_000_0000000003_0000065636	5880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213823	Alive	\N	5564066	50599262	00749c64ae6c_000_0000000003_0000065636	5940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213884	Alive	\N	5564120	50599367	00749c64ae6c_000_0000000003_0000065636	6000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750213944	Alive	\N	5564120	50599367	00749c64ae6c_000_0000000003_0000065636	6060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214004	Alive	\N	5564120	50599367	00749c64ae6c_000_0000000003_0000065636	6120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214064	Alive	\N	5564120	50599367	00749c64ae6c_000_0000000003_0000065636	6180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214124	Alive	\N	5704863	50965058	00749c64ae6c_000_0000000003_0000065636	6240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214184	Alive	\N	6128669	60019886	00749c64ae6c_000_0000000003_0000065636	6300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214244	Alive	\N	6399879	63386642	00749c64ae6c_000_0000000003_0000065636	6360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214304	Alive	\N	6410119	63427146	00749c64ae6c_000_0000000003_0000065636	6420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214363	Alive	\N	6465271	63574816	00749c64ae6c_000_0000000003_0000065636	6480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214424	Alive	\N	6465639	63575294	00749c64ae6c_000_0000000003_0000065636	6540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214484	Alive	\N	6466065	63575867	00749c64ae6c_000_0000000003_0000065636	6600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214544	Alive	\N	6476001	63599485	00749c64ae6c_000_0000000003_0000065636	6660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214604	Alive	\N	6548705	64106761	00749c64ae6c_000_0000000003_0000065636	6720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214664	Alive	\N	6569316	64145482	00749c64ae6c_000_0000000003_0000065636	6780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214724	Alive	\N	6570210	64152814	00749c64ae6c_000_0000000003_0000065636	6840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214784	Alive	\N	6570370	64154472	00749c64ae6c_000_0000000003_0000065636	6900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214843	Alive	\N	6570626	64155232	00749c64ae6c_000_0000000003_0000065636	6960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214903	Alive	\N	6570626	64155843	00749c64ae6c_000_0000000003_0000065636	7020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750214964	Alive	\N	6683218	64237601	00749c64ae6c_000_0000000003_0000065636	7080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215024	Alive	\N	6685292	64240498	00749c64ae6c_000_0000000003_0000065636	7140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215084	Alive	\N	6744573	64293972	00749c64ae6c_000_0000000003_0000065636	7200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215144	Alive	\N	6747079	64299363	00749c64ae6c_000_0000000003_0000065636	7260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215204	Alive	\N	6747517	64299751	00749c64ae6c_000_0000000003_0000065636	7320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215264	Alive	\N	6747678	64299922	00749c64ae6c_000_0000000003_0000065636	7380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215324	Alive	\N	6748061	64300222	00749c64ae6c_000_0000000003_0000065636	7440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215383	Alive	\N	6748156	64300393	00749c64ae6c_000_0000000003_0000065636	7500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215443	Alive	\N	6748698	64303906	00749c64ae6c_000_0000000003_0000065636	7560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215504	Alive	\N	6748752	64304007	00749c64ae6c_000_0000000003_0000065636	7620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215564	Alive	\N	6748847	64304178	00749c64ae6c_000_0000000003_0000065636	7680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215624	Alive	\N	6773763	64323098	00749c64ae6c_000_0000000003_0000065636	7740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215684	Alive	\N	6839305	64355104	00749c64ae6c_000_0000000003_0000065636	7800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215744	Alive	\N	6839595	64357837	00749c64ae6c_000_0000000003_0000065636	7860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215804	Alive	\N	6839822	64358120	00749c64ae6c_000_0000000003_0000065636	7920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215864	Alive	\N	6839822	64358120	00749c64ae6c_000_0000000003_0000065636	7980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215923	Alive	\N	6840546	64358691	00749c64ae6c_000_0000000003_0000065636	8040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750215984	Alive	\N	6840546	64359978	00749c64ae6c_000_0000000003_0000065636	8100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216044	Alive	\N	6840546	64362123	00749c64ae6c_000_0000000003_0000065636	8160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216104	Alive	\N	6840943	64365053	00749c64ae6c_000_0000000003_0000065636	8220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216164	Alive	\N	6840997	64365171	00749c64ae6c_000_0000000003_0000065636	8280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216224	Alive	\N	6841391	64365586	00749c64ae6c_000_0000000003_0000065636	8340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216284	Alive	\N	6841391	64365586	00749c64ae6c_000_0000000003_0000065636	8400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216344	Alive	\N	6841391	64365586	00749c64ae6c_000_0000000003_0000065636	8460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216404	Alive	\N	6841552	64365869	00749c64ae6c_000_0000000003_0000065636	8520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216463	Alive	\N	6841552	64365869	00749c64ae6c_000_0000000003_0000065636	8580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216523	Alive	\N	6863905	64384389	00749c64ae6c_000_0000000003_0000065636	8640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216584	Alive	\N	6863905	64384389	00749c64ae6c_000_0000000003_0000065636	8700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216644	Alive	\N	6863905	64384389	00749c64ae6c_000_0000000003_0000065636	8760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216704	Alive	\N	6864000	64384560	00749c64ae6c_000_0000000003_0000065636	8820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216764	Alive	\N	6864411	64385303	00749c64ae6c_000_0000000003_0000065636	8880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216824	Alive	\N	6865088	64385740	00749c64ae6c_000_0000000003_0000065636	8940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216884	Alive	\N	6865088	64385740	00749c64ae6c_000_0000000003_0000065636	9000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750216944	Alive	\N	6865088	64385740	00749c64ae6c_000_0000000003_0000065636	9060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217003	Alive	\N	6865249	64386023	00749c64ae6c_000_0000000003_0000065636	9120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217064	Alive	\N	6865249	64386023	00749c64ae6c_000_0000000003_0000065636	9180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217124	Alive	\N	6865711	64386372	00749c64ae6c_000_0000000003_0000065636	9240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217184	Alive	\N	6865711	64386372	00749c64ae6c_000_0000000003_0000065636	9300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217244	Alive	\N	6865711	64386372	00749c64ae6c_000_0000000003_0000065636	9360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217304	Alive	\N	6866045	64386742	00749c64ae6c_000_0000000003_0000065636	9420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217364	Alive	\N	7062578	64617277	00749c64ae6c_000_0000000003_0000065636	9480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217424	Alive	\N	7067594	64621266	00749c64ae6c_000_0000000003_0000065636	9540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217484	Alive	\N	7310361	66009058	00749c64ae6c_000_0000000003_0000065636	9600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217543	Alive	\N	7486018	66283917	00749c64ae6c_000_0000000003_0000065636	9660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217604	Alive	\N	7552840	66406417	00749c64ae6c_000_0000000003_0000065636	9720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217664	Alive	\N	7606756	66478962	00749c64ae6c_000_0000000003_0000065636	9780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217724	Alive	\N	7633904	66523693	00749c64ae6c_000_0000000003_0000065636	9840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217784	Alive	\N	7643700	66537608	00749c64ae6c_000_0000000003_0000065636	9900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217844	Alive	\N	7671702	66564338	00749c64ae6c_000_0000000003_0000065636	9960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217904	Alive	\N	7676511	66573721	00749c64ae6c_000_0000000003_0000065636	10020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750217964	Alive	\N	7851116	66920302	00749c64ae6c_000_0000000003_0000065636	10080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218024	Alive	\N	7949090	67035436	00749c64ae6c_000_0000000003_0000065636	10140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218083	Alive	\N	8454575	70896314	00749c64ae6c_000_0000000003_0000065636	10200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218144	Alive	\N	8530116	71190661	00749c64ae6c_000_0000000003_0000065636	10260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218204	Alive	\N	8543512	71207580	00749c64ae6c_000_0000000003_0000065636	10320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218264	Alive	\N	8640121	71252339	00749c64ae6c_000_0000000003_0000065636	10380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218324	Alive	\N	8659474	71276185	00749c64ae6c_000_0000000003_0000065636	10440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218384	Alive	\N	8806411	71321522	00749c64ae6c_000_0000000003_0000065636	10500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218444	Alive	\N	8817421	71333703	00749c64ae6c_000_0000000003_0000065636	10560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218504	Alive	\N	8818716	71334712	00749c64ae6c_000_0000000003_0000065636	10620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218564	Alive	\N	8819021	71335105	00749c64ae6c_000_0000000003_0000065636	10680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218623	Alive	\N	8821761	71338345	00749c64ae6c_000_0000000003_0000065636	10740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218684	Alive	\N	8871330	71402973	00749c64ae6c_000_0000000003_0000065636	10800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218744	Alive	\N	8873512	71405188	00749c64ae6c_000_0000000003_0000065636	10860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218804	Alive	\N	9042664	71650442	00749c64ae6c_000_0000000003_0000065636	10920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218864	Alive	\N	9125742	71992761	00749c64ae6c_000_0000000003_0000065636	10980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218924	Alive	\N	9228626	72651968	00749c64ae6c_000_0000000003_0000065636	11040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750218984	Alive	\N	9447638	72743920	00749c64ae6c_000_0000000003_0000065636	11100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219044	Alive	\N	9865934	73322480	00749c64ae6c_000_0000000003_0000065636	11160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219104	Alive	\N	9979463	73409569	00749c64ae6c_000_0000000003_0000065636	11220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219163	Alive	\N	10065509	73453085	00749c64ae6c_000_0000000003_0000065636	11280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219224	Alive	\N	10117383	73488718	00749c64ae6c_000_0000000003_0000065636	11340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219284	Alive	\N	10174825	73536432	00749c64ae6c_000_0000000003_0000065636	11400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219344	Alive	\N	10181168	73542659	00749c64ae6c_000_0000000003_0000065636	11460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219404	Alive	\N	10181924	73543342	00749c64ae6c_000_0000000003_0000065636	11520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219464	Alive	\N	10595380	85415240	00749c64ae6c_000_0000000003_0000065636	11580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219524	Alive	\N	11067318	94223192	00749c64ae6c_000_0000000003_0000065636	11640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219584	Alive	\N	11506642	105165079	00749c64ae6c_000_0000000003_0000065636	11700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219644	Alive	\N	11516495	105176182	00749c64ae6c_000_0000000003_0000065636	11760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219703	Alive	\N	11525242	105198679	00749c64ae6c_000_0000000003_0000065636	11820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219764	Alive	\N	11811480	117589137	00749c64ae6c_000_0000000003_0000065636	11880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219824	Alive	\N	11978659	126927830	00749c64ae6c_000_0000000003_0000065636	11940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219884	Alive	\N	12044787	130506014	00749c64ae6c_000_0000000003_0000065636	12000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750219944	Alive	\N	12100496	134064729	00749c64ae6c_000_0000000003_0000065636	12060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220004	Alive	\N	12464161	144960391	00749c64ae6c_000_0000000003_0000065636	12120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220064	Alive	\N	12999673	154426401	00749c64ae6c_000_0000000003_0000065636	12180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220124	Alive	\N	13288311	173970339	00749c64ae6c_000_0000000003_0000065636	12240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220184	Alive	\N	13302440	173980381	00749c64ae6c_000_0000000003_0000065636	12300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220243	Alive	\N	13575970	179984213	00749c64ae6c_000_0000000003_0000065636	12360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220304	Alive	\N	13628991	180664997	00749c64ae6c_000_0000000003_0000065636	12420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220364	Alive	\N	13647807	180696295	00749c64ae6c_000_0000000003_0000065636	12480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220424	Alive	\N	13737869	180832370	00749c64ae6c_000_0000000003_0000065636	12540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220484	Alive	\N	13738348	180832727	00749c64ae6c_000_0000000003_0000065636	12600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220544	Alive	\N	13738923	180833311	00749c64ae6c_000_0000000003_0000065636	12660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220604	Alive	\N	13738977	180833416	00749c64ae6c_000_0000000003_0000065636	12720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220664	Alive	\N	13767722	180855067	00749c64ae6c_000_0000000003_0000065636	12780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220724	Alive	\N	13768075	180855416	00749c64ae6c_000_0000000003_0000065636	12840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220783	Alive	\N	13768236	180856265	00749c64ae6c_000_0000000003_0000065636	12900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220844	Alive	\N	14000232	186141667	00749c64ae6c_000_0000000003_0000065636	12960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220904	Alive	\N	14375383	187172587	00749c64ae6c_000_0000000003_0000065636	13020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750220964	Alive	\N	14700040	190380693	00749c64ae6c_000_0000000003_0000065636	13080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221024	Alive	\N	14920319	190556950	00749c64ae6c_000_0000000003_0000065636	13140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221084	Alive	\N	15163307	190727702	00749c64ae6c_000_0000000003_0000065636	13200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221144	Alive	\N	15358143	190853622	00749c64ae6c_000_0000000003_0000065636	13260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221204	Alive	\N	15567959	190979093	00749c64ae6c_000_0000000003_0000065636	13320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221263	Alive	\N	15775431	191132597	00749c64ae6c_000_0000000003_0000065636	13380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221323	Alive	\N	15953529	191261552	00749c64ae6c_000_0000000003_0000065636	13440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221384	Alive	\N	16137063	191378697	00749c64ae6c_000_0000000003_0000065636	13500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221444	Alive	\N	16353143	191534112	00749c64ae6c_000_0000000003_0000065636	13560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221504	Alive	\N	16535707	191669634	00749c64ae6c_000_0000000003_0000065636	13620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221564	Alive	\N	16733911	191798883	00749c64ae6c_000_0000000003_0000065636	13680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221624	Alive	\N	16936935	191935607	00749c64ae6c_000_0000000003_0000065636	13740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221684	Alive	\N	17118076	192069560	00749c64ae6c_000_0000000003_0000065636	13800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221744	Alive	\N	17323509	192267095	00749c64ae6c_000_0000000003_0000065636	13860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221804	Alive	\N	17510750	192436353	00749c64ae6c_000_0000000003_0000065636	13920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221863	Alive	\N	17698606	192601214	00749c64ae6c_000_0000000003_0000065636	13980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221924	Alive	\N	17896573	192773898	00749c64ae6c_000_0000000003_0000065636	14040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750221984	Alive	\N	18069238	192924524	00749c64ae6c_000_0000000003_0000065636	14100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222044	Alive	\N	18273367	193076884	00749c64ae6c_000_0000000003_0000065636	14160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222104	Alive	\N	18462573	193239111	00749c64ae6c_000_0000000003_0000065636	14220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222164	Alive	\N	18656503	193391495	00749c64ae6c_000_0000000003_0000065636	14280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222224	Alive	\N	18817352	193513823	00749c64ae6c_000_0000000003_0000065636	14340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222284	Alive	\N	19009599	193642054	00749c64ae6c_000_0000000003_0000065636	14400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222343	Alive	\N	19237765	194068428	00749c64ae6c_000_0000000003_0000065636	14460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222403	Alive	\N	19396767	194348375	00749c64ae6c_000_0000000003_0000065636	14520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222464	Alive	\N	19563574	194851048	00749c64ae6c_000_0000000003_0000065636	14580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222524	Alive	\N	19708996	195092318	00749c64ae6c_000_0000000003_0000065636	14640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222584	Alive	\N	19856181	195362247	00749c64ae6c_000_0000000003_0000065636	14700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222644	Alive	\N	20005588	195638976	00749c64ae6c_000_0000000003_0000065636	14760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222704	Alive	\N	20533323	206751082	00749c64ae6c_000_0000000003_0000065636	14820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222764	Alive	\N	21790157	229133620	00749c64ae6c_000_0000000003_0000065636	14880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222823	Alive	\N	22241279	235021669	00749c64ae6c_000_0000000003_0000065636	14940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222883	Alive	\N	22810406	244144692	00749c64ae6c_000_0000000003_0000065636	15000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750222944	Alive	\N	23056051	250876676	00749c64ae6c_000_0000000003_0000065636	15060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223004	Alive	\N	23340391	258069870	00749c64ae6c_000_0000000003_0000065636	15120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223064	Alive	\N	24050059	281082951	00749c64ae6c_000_0000000003_0000065636	15180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223124	Alive	\N	24527307	294174406	00749c64ae6c_000_0000000003_0000065636	15240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223184	Alive	\N	24704819	302250592	00749c64ae6c_000_0000000003_0000065636	15300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223244	Alive	\N	25250048	320241253	00749c64ae6c_000_0000000003_0000065636	15360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223304	Alive	\N	25548923	330392485	00749c64ae6c_000_0000000003_0000065636	15420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223363	Alive	\N	25828047	335903901	00749c64ae6c_000_0000000003_0000065636	15480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223424	Alive	\N	25959470	341750919	00749c64ae6c_000_0000000003_0000065636	15540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223484	Alive	\N	26110798	345905729	00749c64ae6c_000_0000000003_0000065636	15600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223544	Alive	\N	26384839	356184607	00749c64ae6c_000_0000000003_0000065636	15660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223604	Alive	\N	26682376	364045646	00749c64ae6c_000_0000000003_0000065636	15720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223664	Alive	\N	27151810	382058263	00749c64ae6c_000_0000000003_0000065636	15780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223724	Alive	\N	27463380	388690106	00749c64ae6c_000_0000000003_0000065636	15840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223784	Alive	\N	27852369	405778761	00749c64ae6c_000_0000000003_0000065636	15900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223843	Alive	\N	28221981	417185553	00749c64ae6c_000_0000000003_0000065636	15960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223903	Alive	\N	28588084	427561499	00749c64ae6c_000_0000000003_0000065636	16020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750223964	Alive	\N	28773945	433356723	00749c64ae6c_000_0000000003_0000065636	16080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224024	Alive	\N	28877934	435815782	00749c64ae6c_000_0000000003_0000065636	16140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224084	Alive	\N	29034141	439474929	00749c64ae6c_000_0000000003_0000065636	16200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224144	Alive	\N	29238850	447096184	00749c64ae6c_000_0000000003_0000065636	16260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224204	Alive	\N	29482544	455678452	00749c64ae6c_000_0000000003_0000065636	16320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224264	Alive	\N	30026908	471880999	00749c64ae6c_000_0000000003_0000065636	16380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224324	Alive	\N	30214894	479955051	00749c64ae6c_000_0000000003_0000065636	16440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224383	Alive	\N	30701996	497041375	00749c64ae6c_000_0000000003_0000065636	16500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224444	Alive	\N	30765158	498094064	00749c64ae6c_000_0000000003_0000065636	16560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224504	Alive	\N	30790151	498135970	00749c64ae6c_000_0000000003_0000065636	16620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224564	Alive	\N	30874054	498349209	00749c64ae6c_000_0000000003_0000065636	16680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224624	Alive	\N	30917587	498382328	00749c64ae6c_000_0000000003_0000065636	16740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224684	Alive	\N	30974191	498421828	00749c64ae6c_000_0000000003_0000065636	16800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224744	Alive	\N	30974407	498423231	00749c64ae6c_000_0000000003_0000065636	16860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224804	Alive	\N	30974896	498424160	00749c64ae6c_000_0000000003_0000065636	16920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224863	Alive	\N	30975058	498424457	00749c64ae6c_000_0000000003_0000065636	16980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224923	Alive	\N	30975753	498425240	00749c64ae6c_000_0000000003_0000065636	17040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750224984	Alive	\N	30978557	498433616	00749c64ae6c_000_0000000003_0000065636	17100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750225044	Alive	\N	30985294	498444086	00749c64ae6c_000_0000000003_0000065636	17160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750225104	Alive	\N	31006013	498510087	00749c64ae6c_000_0000000003_0000065636	17220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750225169	Alive	\N	31027201	498560151	00749c64ae6c_000_0000000003_0000065636	17280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750225202	Start	\N	\N	\N	00749c646f48_000_0000000072_1750225200	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750225224	Alive	\N	31036114	498585173	00749c64ae6c_000_0000000003_0000065636	17340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750225284	Alive	\N	31079852	498639376	00749c64ae6c_000_0000000003_0000065636	17400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750225322	Stop	\N	588822	8720117	00749c646f48_000_0000000072_1750225200	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750225326	Start	\N	\N	\N	00749c646f48_000_0000000073_1750225324	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750225344	Alive	\N	31091118	498673527	00749c64ae6c_000_0000000003_0000065636	17460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750225403	Alive	\N	31092077	498674930	00749c64ae6c_000_0000000003_0000065636	17520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750225446	Stop	\N	2931	2257	00749c646f48_000_0000000073_1750225324	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750225460	Start	\N	\N	\N	00749c646f48_000_0000000074_1750225458	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750225463	Alive	\N	31092250	498675206	00749c64ae6c_000_0000000003_0000065636	17580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750225524	Alive	\N	31093275	498676500	00749c64ae6c_000_0000000003_0000065636	17640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750225579	Stop	\N	2725	5224	00749c646f48_000_0000000074_1750225458	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750225584	Alive	\N	31093653	498676737	00749c64ae6c_000_0000000003_0000065636	17700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750225644	Alive	\N	31093932	498678146	00749c64ae6c_000_0000000003_0000065636	17760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750225704	Alive	\N	31094094	498678431	00749c64ae6c_000_0000000003_0000065636	17820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750225754	Start	\N	\N	\N	00749c646f48_000_0000000075_1750225752	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750225764	Alive	\N	31094202	498678709	00749c64ae6c_000_0000000003_0000065636	17880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750225824	Alive	\N	31094501	498678953	00749c64ae6c_000_0000000003_0000065636	17940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750225874	Stop	\N	1098	818	00749c646f48_000_0000000075_1750225752	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750225879	Start	\N	\N	\N	00749c646f48_000_0000000076_1750225877	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750225884	Alive	\N	31094501	498678953	00749c64ae6c_000_0000000003_0000065636	18000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750225943	Alive	\N	31107311	498703153	00749c64ae6c_000_0000000003_0000065636	18060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750225999	Stop	\N	0	0	00749c646f48_000_0000000076_1750225877	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750226004	Alive	\N	31107629	498703405	00749c64ae6c_000_0000000003_0000065636	18120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750226064	Alive	\N	31113933	498725407	00749c64ae6c_000_0000000003_0000065636	18180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750226114	Start	\N	\N	\N	00749c646f48_000_0000000077_1750226112	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750226124	Alive	\N	31114235	498725652	00749c64ae6c_000_0000000003_0000065636	18240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750226184	Alive	\N	31114553	498725838	00749c64ae6c_000_0000000003_0000065636	18300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750226235	Stop	\N	8467	14220	00749c646f48_000_0000000077_1750226112	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750226244	Alive	\N	31118468	498734186	00749c64ae6c_000_0000000003_0000065636	18360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750226245	Start	\N	\N	\N	00749c646f48_000_0000000078_1750226243	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750226304	Alive	\N	31118786	498734438	00749c64ae6c_000_0000000003_0000065636	18420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750226364	Alive	\N	31118881	498734609	00749c64ae6c_000_0000000003_0000065636	18480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750226365	Stop	\N	1912	98	00749c646f48_000_0000000078_1750226243	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750226424	Alive	\N	31119180	498734854	00749c64ae6c_000_0000000003_0000065636	18540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750226483	Alive	\N	31119180	498734854	00749c64ae6c_000_0000000003_0000065636	18600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750226544	Alive	\N	31119341	498735137	00749c64ae6c_000_0000000003_0000065636	18660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750226604	Alive	\N	31119341	498735137	00749c64ae6c_000_0000000003_0000065636	18720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750226664	Alive	\N	31119594	498735487	00749c64ae6c_000_0000000003_0000065636	18780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750226724	Alive	\N	31184560	498788992	00749c64ae6c_000_0000000003_0000065636	18840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750226784	Alive	\N	31184746	498789172	00749c64ae6c_000_0000000003_0000065636	18900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750226844	Alive	\N	31184907	498789343	00749c64ae6c_000_0000000003_0000065636	18960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750226877	Start	\N	\N	\N	00749c646f48_000_0000000079_1750226875	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750226904	Alive	\N	31184907	498789343	00749c64ae6c_000_0000000003_0000065636	19020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750226964	Alive	\N	31185278	498789858	00749c64ae6c_000_0000000003_0000065636	19080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750226997	Stop	\N	8438	13438	00749c646f48_000_0000000079_1750226875	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750227007	Start	\N	\N	\N	00749c646f48_000_0000000080_1750227005	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750227023	Alive	\N	31185580	498790037	00749c64ae6c_000_0000000003_0000065636	19140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750227084	Alive	\N	31185672	498790216	00749c64ae6c_000_0000000003_0000065636	19200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750227126	Stop	\N	0	0	00749c646f48_000_0000000080_1750227005	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750227144	Alive	\N	31185899	498790499	00749c64ae6c_000_0000000003_0000065636	19260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750227194	Start	\N	\N	\N	00749c646f48_000_0000000081_1750227192	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750227204	Alive	\N	31185899	498790499	00749c64ae6c_000_0000000003_0000065636	19320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750227264	Alive	\N	31212848	498824711	00749c64ae6c_000_0000000003_0000065636	19380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750227314	Stop	\N	7096	28013	00749c646f48_000_0000000081_1750227192	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750227324	Alive	\N	31220568	498831928	00749c64ae6c_000_0000000003_0000065636	19440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750227336	Start	\N	\N	\N	00749c646f48_000_0000000082_1750227334	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750227384	Alive	\N	31527302	505847071	00749c64ae6c_000_0000000003_0000065636	19500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750227444	Alive	\N	31933469	515416685	00749c64ae6c_000_0000000003_0000065636	19560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750227461	Stop	\N	858	614	00749c646f48_000_0000000082_1750227334	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750227504	Alive	\N	32699684	515505362	00749c64ae6c_000_0000000003_0000065636	19620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750227563	Alive	\N	32951635	520954448	00749c64ae6c_000_0000000003_0000065636	19680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750227624	Alive	\N	33164773	527823975	00749c64ae6c_000_0000000003_0000065636	19740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750227684	Alive	\N	33396079	529096410	00749c64ae6c_000_0000000003_0000065636	19800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750227744	Alive	\N	33456527	529208320	00749c64ae6c_000_0000000003_0000065636	19860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750227746	Start	\N	\N	\N	00749c646f48_000_0000000083_1750227744	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750227804	Alive	\N	33505595	529233027	00749c64ae6c_000_0000000003_0000065636	19920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750227864	Alive	\N	33515553	529236890	00749c64ae6c_000_0000000003_0000065636	19980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750227866	Stop	\N	17960	24039	00749c646f48_000_0000000083_1750227744	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750227886	Start	\N	\N	\N	00749c646f48_000_0000000084_1750227884	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750227924	Alive	\N	33547330	529247005	00749c64ae6c_000_0000000003_0000065636	20040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750227984	Alive	\N	33548717	529248986	00749c64ae6c_000_0000000003_0000065636	20100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750228006	Stop	\N	0	0	00749c646f48_000_0000000084_1750227884	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750228044	Alive	\N	33548717	529248986	00749c64ae6c_000_0000000003_0000065636	20160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750228103	Alive	\N	33656933	529301791	00749c64ae6c_000_0000000003_0000065636	20220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750228164	Alive	\N	33657638	529302609	00749c64ae6c_000_0000000003_0000065636	20280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750228224	Alive	\N	33658809	529303438	00749c64ae6c_000_0000000003_0000065636	20340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750228284	Alive	\N	33659918	529304940	00749c64ae6c_000_0000000003_0000065636	20400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750228344	Alive	\N	33693428	529682633	00749c64ae6c_000_0000000003_0000065636	20460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750228404	Alive	\N	33693822	529687996	00749c64ae6c_000_0000000003_0000065636	20520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750228427	Start	\N	\N	\N	00749c646f48_000_0000000085_1750228425	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750228464	Alive	\N	33693984	529689025	00749c64ae6c_000_0000000003_0000065636	20580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750228524	Alive	\N	33694367	529690170	00749c64ae6c_000_0000000003_0000065636	20640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750228547	Stop	\N	15142	22679	00749c646f48_000_0000000085_1750228425	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750228557	Start	\N	\N	\N	00749c646f48_000_0000000086_1750228555	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750228583	Alive	\N	33694421	529692368	00749c64ae6c_000_0000000003_0000065636	20700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750228643	Alive	\N	33694712	529694794	00749c64ae6c_000_0000000003_0000065636	20760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750228677	Stop	\N	0	0	00749c646f48_000_0000000086_1750228555	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750228704	Alive	\N	33760773	529748059	00749c64ae6c_000_0000000003_0000065636	20820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750228764	Alive	\N	33774069	529770102	00749c64ae6c_000_0000000003_0000065636	20880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750228802	Start	\N	\N	\N	00749c646f48_000_0000000087_1750228800	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750228824	Alive	\N	33774368	529770347	00749c64ae6c_000_0000000003_0000065636	20940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750228884	Alive	\N	34245644	540743796	00749c64ae6c_000_0000000003_0000065636	21000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750228922	Stop	\N	3793	11482	00749c646f48_000_0000000087_1750228800	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750228944	Alive	\N	34322823	544239674	00749c64ae6c_000_0000000003_0000065636	21060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750228960	Start	\N	\N	\N	00749c646f48_000_0000000088_1750228958	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750229004	Alive	\N	34342755	544309013	00749c64ae6c_000_0000000003_0000065636	21120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750229064	Alive	\N	34360928	544371170	00749c64ae6c_000_0000000003_0000065636	21180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750229081	Stop	\N	683343	2976234	00749c646f48_000_0000000088_1750228958	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750229100	Start	\N	\N	\N	00749c646f48_000_0000000089_1750229098	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750229123	Alive	\N	34387949	544707480	00749c64ae6c_000_0000000003_0000065636	21240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750229184	Alive	\N	34407705	544774615	00749c64ae6c_000_0000000003_0000065636	21300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750229219	Stop	\N	168594	2052679	00749c646f48_000_0000000089_1750229098	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750229229	Start	\N	\N	\N	00749c646f48_000_0000000090_1750229227	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750229244	Alive	\N	34507638	547852897	00749c64ae6c_000_0000000003_0000065636	21360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750229304	Alive	\N	34739583	564258270	00749c64ae6c_000_0000000003_0000065636	21420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750229349	Stop	\N	1521	12144	00749c646f48_000_0000000090_1750229227	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750229364	Alive	\N	34860805	565280891	00749c64ae6c_000_0000000003_0000065636	21480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750229424	Alive	\N	34898124	565572952	00749c64ae6c_000_0000000003_0000065636	21540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750229459	Start	\N	\N	\N	00749c646f48_000_0000000091_1750229457	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750229484	Alive	\N	34926602	565645056	00749c64ae6c_000_0000000003_0000065636	21600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750229544	Alive	\N	34944121	565707523	00749c64ae6c_000_0000000003_0000065636	21660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750229579	Stop	\N	25641	8782	00749c646f48_000_0000000091_1750229457	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750229604	Alive	\N	35065457	570438863	00749c64ae6c_000_0000000003_0000065636	21720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750229625	Start	\N	\N	\N	00749c646f48_000_0000000092_1750229623	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750229663	Alive	\N	35221305	570514507	00749c64ae6c_000_0000000003_0000065636	21780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750229724	Alive	\N	35236794	570571608	00749c64ae6c_000_0000000003_0000065636	21840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750229744	Stop	\N	92742	502594	00749c646f48_000_0000000092_1750229623	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750229778	Start	\N	\N	\N	00749c646f48_000_0000000093_1750229776	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750229784	Alive	\N	35246916	570627005	00749c64ae6c_000_0000000003_0000065636	21900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750229844	Alive	\N	35417943	577799337	00749c64ae6c_000_0000000003_0000065636	21960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750229898	Stop	\N	11710	16332	00749c646f48_000_0000000093_1750229776	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750229904	Alive	\N	35605477	582070790	00749c64ae6c_000_0000000003_0000065636	22020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750229913	Start	\N	\N	\N	00749c646f48_000_0000000094_1750229908	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750229964	Alive	\N	35839265	586730553	00749c64ae6c_000_0000000003_0000065636	22080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750230024	Alive	\N	35884576	586830425	00749c64ae6c_000_0000000003_0000065636	22140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750230033	Stop	\N	108	341	00749c646f48_000_0000000094_1750229908	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750230084	Alive	\N	35884718	586830513	00749c64ae6c_000_0000000003_0000065636	22200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750230144	Alive	\N	35884718	586830513	00749c64ae6c_000_0000000003_0000065636	22260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750230203	Alive	\N	35884889	586831403	00749c64ae6c_000_0000000003_0000065636	22320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750230264	Alive	\N	35890521	586837045	00749c64ae6c_000_0000000003_0000065636	22380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750230324	Alive	\N	35927004	586916998	00749c64ae6c_000_0000000003_0000065636	22440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750230384	Alive	\N	35927058	586917099	00749c64ae6c_000_0000000003_0000065636	22500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750230444	Alive	\N	35927112	586917200	00749c64ae6c_000_0000000003_0000065636	22560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750230504	Alive	\N	35927112	586917200	00749c64ae6c_000_0000000003_0000065636	22620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750230564	Alive	\N	35927112	586917200	00749c64ae6c_000_0000000003_0000065636	22680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750230604	Start	\N	\N	\N	00749c646f48_000_0000000095_1750230603	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750230624	Alive	\N	35927414	586917379	00749c64ae6c_000_0000000003_0000065636	22740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750230683	Alive	\N	35927414	586917379	00749c64ae6c_000_0000000003_0000065636	22800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750230724	Stop	\N	699	1999	00749c646f48_000_0000000095_1750230603	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750230737	Start	\N	\N	\N	00749c646f48_000_0000000096_1750230735	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750230743	Alive	\N	36029624	586942062	00749c64ae6c_000_0000000003_0000065636	22860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750230804	Alive	\N	36029624	586942062	00749c64ae6c_000_0000000003_0000065636	22920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750230857	Stop	\N	0	0	00749c646f48_000_0000000096_1750230735	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750230864	Alive	\N	36029624	586942062	00749c64ae6c_000_0000000003_0000065636	22980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750230924	Alive	\N	36030088	586942638	00749c64ae6c_000_0000000003_0000065636	23040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750230984	Alive	\N	36030088	586942638	00749c64ae6c_000_0000000003_0000065636	23100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750230994	Start	\N	\N	\N	00749c646f48_000_0000000097_1750230992	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750231044	Alive	\N	36059434	586978692	00749c64ae6c_000_0000000003_0000065636	23160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750231104	Alive	\N	36082720	587008908	00749c64ae6c_000_0000000003_0000065636	23220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750231114	Stop	\N	0	0	00749c646f48_000_0000000097_1750230992	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750231131	Start	\N	\N	\N	00749c646f48_000_0000000098_1750231130	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750231164	Alive	\N	36082720	587020132	00749c64ae6c_000_0000000003_0000065636	23280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750231223	Alive	\N	36114710	587090955	00749c64ae6c_000_0000000003_0000065636	23340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750231251	Stop	\N	0	0	00749c646f48_000_0000000098_1750231130	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750231270	Start	\N	\N	\N	00749c646f48_000_0000000099_1750231268	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750231284	Alive	\N	36115111	587092924	00749c64ae6c_000_0000000003_0000065636	23400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750231344	Alive	\N	36115272	587093095	00749c64ae6c_000_0000000003_0000065636	23460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750231390	Stop	\N	29707	49199	00749c646f48_000_0000000099_1750231268	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750231402	Start	\N	\N	\N	00749c646f48_000_0000000100_1750231400	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750231404	Alive	\N	36144403	587149016	00749c64ae6c_000_0000000003_0000065636	23520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750231464	Alive	\N	36145209	587150293	00749c64ae6c_000_0000000003_0000065636	23580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750231522	Stop	\N	0	0	00749c646f48_000_0000000100_1750231400	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750231524	Alive	\N	36145853	587153137	00749c64ae6c_000_0000000003_0000065636	23640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750231584	Alive	\N	36146014	587153308	00749c64ae6c_000_0000000003_0000065636	23700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750231644	Alive	\N	36146296	587153708	00749c64ae6c_000_0000000003_0000065636	23760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750231704	Alive	\N	36146685	587154229	00749c64ae6c_000_0000000003_0000065636	23820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750231763	Alive	\N	36146685	587154229	00749c64ae6c_000_0000000003_0000065636	23880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750231824	Alive	\N	36147197	587154474	00749c64ae6c_000_0000000003_0000065636	23940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750231857	Start	\N	\N	\N	00749c646f48_000_0000000101_1750231856	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750231884	Alive	\N	36147292	587154645	00749c64ae6c_000_0000000003_0000065636	24000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750231944	Alive	\N	36274496	587184267	00749c64ae6c_000_0000000003_0000065636	24060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750231977	Stop	\N	158	842	00749c646f48_000_0000000101_1750231856	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750231989	Start	\N	\N	\N	00749c646f48_000_0000000102_1750231988	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750232004	Alive	\N	36274811	587184840	00749c64ae6c_000_0000000003_0000065636	24120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750232064	Alive	\N	36274811	587184840	00749c64ae6c_000_0000000003_0000065636	24180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750232109	Stop	\N	0	0	00749c646f48_000_0000000102_1750231988	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750232124	Alive	\N	36275267	587185429	00749c64ae6c_000_0000000003_0000065636	24240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750232184	Alive	\N	36275428	587185600	00749c64ae6c_000_0000000003_0000065636	24300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750232237	Start	\N	\N	\N	00749c646f48_000_0000000103_1750232235	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750232244	Alive	\N	36275494	587185712	00749c64ae6c_000_0000000003_0000065636	24360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750232303	Alive	\N	36275655	587185883	00749c64ae6c_000_0000000003_0000065636	24420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750232356	Stop	\N	9980	10793	00749c646f48_000_0000000103_1750232235	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750232364	Alive	\N	36275655	587185883	00749c64ae6c_000_0000000003_0000065636	24480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750232364	Start	\N	\N	\N	00749c646f48_000_0000000104_1750232363	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750232424	Alive	\N	36275957	587186062	00749c64ae6c_000_0000000003_0000065636	24540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750232484	Stop	\N	22071	23969	00749c646f48_000_0000000104_1750232363	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750232484	Alive	\N	36276223	587187147	00749c64ae6c_000_0000000003_0000065636	24600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750232544	Alive	\N	36276223	587187147	00749c64ae6c_000_0000000003_0000065636	24660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750232604	Alive	\N	36276318	587187318	00749c64ae6c_000_0000000003_0000065636	24720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750232615	Start	\N	\N	\N	00749c646f48_000_0000000105_1750232614	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750232664	Alive	\N	36276318	587187318	00749c64ae6c_000_0000000003_0000065636	24780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750232724	Alive	\N	36276617	587187563	00749c64ae6c_000_0000000003_0000065636	24840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750232735	Stop	\N	34552	24602	00749c646f48_000_0000000105_1750232614	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750232759	Start	\N	\N	\N	00749c646f48_000_0000000106_1750232757	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750232784	Alive	\N	36276790	587187839	00749c64ae6c_000_0000000003_0000065636	24900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750232843	Alive	\N	36349701	587292098	00749c64ae6c_000_0000000003_0000065636	24960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750232878	Stop	\N	0	0	00749c646f48_000_0000000106_1750232757	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750232904	Alive	\N	36349862	587292269	00749c64ae6c_000_0000000003_0000065636	25020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750232914	Start	\N	\N	\N	00749c646f48_000_0000000107_1750232912	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750232964	Alive	\N	36349862	587292269	00749c64ae6c_000_0000000003_0000065636	25080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750233024	Alive	\N	36350472	587293260	00749c64ae6c_000_0000000003_0000065636	25140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750233034	Stop	\N	18834	168790	00749c646f48_000_0000000107_1750232912	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750233045	Start	\N	\N	\N	00749c646f48_000_0000000108_1750233043	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750233084	Alive	\N	36356302	587306198	00749c64ae6c_000_0000000003_0000065636	25200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750233144	Alive	\N	36356537	587306449	00749c64ae6c_000_0000000003_0000065636	25260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750233165	Stop	\N	224	158	00749c646f48_000_0000000108_1750233043	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750233189	Start	\N	\N	\N	00749c646f48_000_0000000109_1750233188	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750233204	Alive	\N	36357776	587308286	00749c64ae6c_000_0000000003_0000065636	25320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750233264	Alive	\N	36357776	587309277	00749c64ae6c_000_0000000003_0000065636	25380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750233309	Stop	\N	853701	25572858	00749c646f48_000_0000000109_1750233188	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750233324	Alive	\N	36358078	587310077	00749c64ae6c_000_0000000003_0000065636	25440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750233334	Start	\N	\N	\N	00749c646f48_000_0000000110_1750233332	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750233383	Alive	\N	36358239	587310433	00749c64ae6c_000_0000000003_0000065636	25500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750233444	Alive	\N	36358305	587310545	00749c64ae6c_000_0000000003_0000065636	25560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750233454	Stop	\N	5639	9296	00749c646f48_000_0000000110_1750233332	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750233504	Alive	\N	36358305	587310730	00749c64ae6c_000_0000000003_0000065636	25620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750233560	Start	\N	\N	\N	00749c646f48_000_0000000111_1750233558	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750233564	Alive	\N	36365969	587324772	00749c64ae6c_000_0000000003_0000065636	25680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750233624	Alive	\N	36366508	587328504	00749c64ae6c_000_0000000003_0000065636	25740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750233680	Stop	\N	1778	2613	00749c646f48_000_0000000111_1750233558	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750233684	Alive	\N	36484925	588144135	00749c64ae6c_000_0000000003_0000065636	25800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750233704	Start	\N	\N	\N	00749c646f48_000_0000000112_1750233703	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750233744	Alive	\N	36668596	588455614	00749c64ae6c_000_0000000003_0000065636	25860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750233804	Alive	\N	36685649	588648240	00749c64ae6c_000_0000000003_0000065636	25920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750233825	Stop	\N	0	0	00749c646f48_000_0000000112_1750233703	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750233863	Alive	\N	36697697	588657723	00749c64ae6c_000_0000000003_0000065636	25980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750233924	Alive	\N	36704758	588663591	00749c64ae6c_000_0000000003_0000065636	26040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750233984	Alive	\N	36707551	588669406	00749c64ae6c_000_0000000003_0000065636	26100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234044	Alive	\N	36707709	588669585	00749c64ae6c_000_0000000003_0000065636	26160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234104	Alive	\N	36724684	588697815	00749c64ae6c_000_0000000003_0000065636	26220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234164	Alive	\N	36725390	588698476	00749c64ae6c_000_0000000003_0000065636	26280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234224	Alive	\N	36726965	588700187	00749c64ae6c_000_0000000003_0000065636	26340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234284	Alive	\N	36765756	588742521	00749c64ae6c_000_0000000003_0000065636	26400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234344	Alive	\N	37044560	588958566	00749c64ae6c_000_0000000003_0000065636	26460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234403	Alive	\N	37054746	588981062	00749c64ae6c_000_0000000003_0000065636	26520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234464	Alive	\N	37057168	588983933	00749c64ae6c_000_0000000003_0000065636	26580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234524	Alive	\N	37261593	589118017	00749c64ae6c_000_0000000003_0000065636	26640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234584	Alive	\N	37273628	589135008	00749c64ae6c_000_0000000003_0000065636	26700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234644	Alive	\N	37273628	589135074	00749c64ae6c_000_0000000003_0000065636	26760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234704	Alive	\N	37421581	589285065	00749c64ae6c_000_0000000003_0000065636	26820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234764	Alive	\N	37426392	589298151	00749c64ae6c_000_0000000003_0000065636	26880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234824	Alive	\N	37433583	589306955	00749c64ae6c_000_0000000003_0000065636	26940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750234884	Alive	\N	37433905	589307297	00749c64ae6c_000_0000000003_0000065636	27000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750234891	Start	\N	\N	\N	00749c646f48_000_0000000113_1750234889	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750234943	Alive	\N	37434820	589310642	00749c64ae6c_000_0000000003_0000065636	27060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750235004	Alive	\N	37434874	589310747	00749c64ae6c_000_0000000003_0000065636	27120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750235010	Stop	\N	8236	8689	00749c646f48_000_0000000113_1750234889	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750235019	Start	\N	\N	\N	00749c646f48_000_0000000114_1750235017	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750235064	Alive	\N	37441076	589334270	00749c64ae6c_000_0000000003_0000065636	27180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750235124	Alive	\N	37441996	589335242	00749c64ae6c_000_0000000003_0000065636	27240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750235139	Stop	\N	0	0	00749c646f48_000_0000000114_1750235017	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750235184	Alive	\N	37442157	589335413	00749c64ae6c_000_0000000003_0000065636	27300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750235244	Alive	\N	37442157	589335413	00749c64ae6c_000_0000000003_0000065636	27360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750235304	Alive	\N	37442315	589335592	00749c64ae6c_000_0000000003_0000065636	27420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750235364	Alive	\N	37480588	589438259	00749c64ae6c_000_0000000003_0000065636	27480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750235423	Alive	\N	37545501	589478684	00749c64ae6c_000_0000000003_0000065636	27540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750235483	Alive	\N	37580756	589486448	00749c64ae6c_000_0000000003_0000065636	27600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750235544	Alive	\N	37581510	589486904	00749c64ae6c_000_0000000003_0000065636	27660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750235564	Start	\N	\N	\N	00749c646f48_000_0000000115_1750235562	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750235604	Alive	\N	37676892	590303274	00749c64ae6c_000_0000000003_0000065636	27720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750235664	Alive	\N	37764585	591394701	00749c64ae6c_000_0000000003_0000065636	27780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750235684	Stop	\N	1696	2421	00749c646f48_000_0000000115_1750235562	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750235692	Start	\N	\N	\N	00749c646f48_000_0000000116_1750235690	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750235724	Alive	\N	37805101	592628173	00749c64ae6c_000_0000000003_0000065636	27840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750235784	Alive	\N	37840893	592797518	00749c64ae6c_000_0000000003_0000065636	27900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750235812	Stop	\N	248	1681	00749c646f48_000_0000000116_1750235690	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750235844	Alive	\N	38169010	598945800	00749c64ae6c_000_0000000003_0000065636	27960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750235904	Alive	\N	38169142	598946005	00749c64ae6c_000_0000000003_0000065636	28020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750235964	Alive	\N	38172850	598949874	00749c64ae6c_000_0000000003_0000065636	28080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750236023	Alive	\N	38183590	598957849	00749c64ae6c_000_0000000003_0000065636	28140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750236084	Alive	\N	38183805	598958086	00749c64ae6c_000_0000000003_0000065636	28200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750236144	Alive	\N	38187367	598959705	00749c64ae6c_000_0000000003_0000065636	28260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750236204	Alive	\N	38187820	598962376	00749c64ae6c_000_0000000003_0000065636	28320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750236264	Alive	\N	38325636	599050738	00749c64ae6c_000_0000000003_0000065636	28380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750236287	Start	\N	\N	\N	00749c646f48_000_0000000117_1750236285	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750236324	Alive	\N	38334677	599055807	00749c64ae6c_000_0000000003_0000065636	28440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750236384	Alive	\N	38441159	599089158	00749c64ae6c_000_0000000003_0000065636	28500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750236407	Stop	\N	294888	4894568	00749c646f48_000_0000000117_1750236285	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750236430	Start	\N	\N	\N	00749c646f48_000_0000000118_1750236428	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750236444	Alive	\N	38463695	599124591	00749c64ae6c_000_0000000003_0000065636	28560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750236498	Stop	\N	0	0	00749c646f48_000_0000000118_1750236428	68	User-Request	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750236504	Alive	\N	38492968	599149595	00749c64ae6c_000_0000000003_0000065636	28620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750236564	Alive	\N	38492968	599149595	00749c64ae6c_000_0000000003_0000065636	28680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750236624	Alive	\N	38528896	599301997	00749c64ae6c_000_0000000003_0000065636	28740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750236684	Alive	\N	38530182	599303739	00749c64ae6c_000_0000000003_0000065636	28800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750236744	Alive	\N	38530600	599304194	00749c64ae6c_000_0000000003_0000065636	28860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750236804	Alive	\N	38590654	599699508	00749c64ae6c_000_0000000003_0000065636	28920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750236864	Alive	\N	38591518	599702559	00749c64ae6c_000_0000000003_0000065636	28980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750236924	Alive	\N	38592433	599703619	00749c64ae6c_000_0000000003_0000065636	29040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750236984	Alive	\N	38701589	599810132	00749c64ae6c_000_0000000003_0000065636	29100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237043	Alive	\N	39274796	610338279	00749c64ae6c_000_0000000003_0000065636	29160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750735677	Start	\N	\N	\N	00749c64ae6c_000_0000000012_0000593428	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237104	Alive	\N	39285511	610350780	00749c64ae6c_000_0000000003_0000065636	29220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237164	Alive	\N	39305992	610380680	00749c64ae6c_000_0000000003_0000065636	29280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237224	Alive	\N	39338613	610426181	00749c64ae6c_000_0000000003_0000065636	29340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237284	Alive	\N	39439005	610482888	00749c64ae6c_000_0000000003_0000065636	29400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237344	Alive	\N	39524640	610763417	00749c64ae6c_000_0000000003_0000065636	29460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237404	Alive	\N	39586403	610808235	00749c64ae6c_000_0000000003_0000065636	29520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237464	Alive	\N	39711414	610888446	00749c64ae6c_000_0000000003_0000065636	29580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237524	Alive	\N	39988962	616295705	00749c64ae6c_000_0000000003_0000065636	29640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237583	Alive	\N	40331109	630408635	00749c64ae6c_000_0000000003_0000065636	29700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237644	Alive	\N	40418587	630540402	00749c64ae6c_000_0000000003_0000065636	29760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237704	Alive	\N	40472339	630568914	00749c64ae6c_000_0000000003_0000065636	29820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237764	Alive	\N	40547360	633182732	00749c64ae6c_000_0000000003_0000065636	29880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237824	Alive	\N	40762865	633274811	00749c64ae6c_000_0000000003_0000065636	29940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237884	Alive	\N	40856662	633311664	00749c64ae6c_000_0000000003_0000065636	30000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750237944	Alive	\N	40921977	633344824	00749c64ae6c_000_0000000003_0000065636	30060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238004	Alive	\N	40933110	633391679	00749c64ae6c_000_0000000003_0000065636	30120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238064	Alive	\N	40933110	633391679	00749c64ae6c_000_0000000003_0000065636	30180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238123	Alive	\N	40939074	633397180	00749c64ae6c_000_0000000003_0000065636	30240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238184	Alive	\N	40939184	633397289	00749c64ae6c_000_0000000003_0000065636	30300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238244	Alive	\N	40939184	633397289	00749c64ae6c_000_0000000003_0000065636	30360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238304	Alive	\N	40939319	633397418	00749c64ae6c_000_0000000003_0000065636	30420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238364	Alive	\N	40951293	633443657	00749c64ae6c_000_0000000003_0000065636	30480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238424	Alive	\N	40976429	633499067	00749c64ae6c_000_0000000003_0000065636	30540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238484	Alive	\N	40976967	633502000	00749c64ae6c_000_0000000003_0000065636	30600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238544	Alive	\N	40977077	633504119	00749c64ae6c_000_0000000003_0000065636	30660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238604	Alive	\N	41114090	633676054	00749c64ae6c_000_0000000003_0000065636	30720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238663	Alive	\N	41548109	649227842	00749c64ae6c_000_0000000003_0000065636	30780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238724	Alive	\N	41681644	656452721	00749c64ae6c_000_0000000003_0000065636	30840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238784	Alive	\N	41688038	656458210	00749c64ae6c_000_0000000003_0000065636	30900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238844	Alive	\N	41814551	657019086	00749c64ae6c_000_0000000003_0000065636	30960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238904	Alive	\N	42341810	664185237	00749c64ae6c_000_0000000003_0000065636	31020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750238964	Alive	\N	42533272	667808352	00749c64ae6c_000_0000000003_0000065636	31080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239024	Alive	\N	42785850	679277837	00749c64ae6c_000_0000000003_0000065636	31140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239084	Alive	\N	42839509	680705018	00749c64ae6c_000_0000000003_0000065636	31200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239144	Alive	\N	42873859	680953491	00749c64ae6c_000_0000000003_0000065636	31260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239204	Alive	\N	42874020	680953662	00749c64ae6c_000_0000000003_0000065636	31320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239264	Alive	\N	42976623	680985738	00749c64ae6c_000_0000000003_0000065636	31380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239324	Alive	\N	42978276	680989669	00749c64ae6c_000_0000000003_0000065636	31440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239384	Alive	\N	42978384	680989886	00749c64ae6c_000_0000000003_0000065636	31500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239444	Alive	\N	42985488	680997518	00749c64ae6c_000_0000000003_0000065636	31560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239504	Alive	\N	42985916	680997838	00749c64ae6c_000_0000000003_0000065636	31620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239564	Alive	\N	42986131	680998075	00749c64ae6c_000_0000000003_0000065636	31680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239624	Alive	\N	42986678	680998628	00749c64ae6c_000_0000000003_0000065636	31740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239684	Alive	\N	42986732	680998729	00749c64ae6c_000_0000000003_0000065636	31800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239743	Alive	\N	42986786	680998834	00749c64ae6c_000_0000000003_0000065636	31860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239804	Alive	\N	42986786	680998834	00749c64ae6c_000_0000000003_0000065636	31920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239864	Alive	\N	43034097	681974468	00749c64ae6c_000_0000000003_0000065636	31980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239924	Alive	\N	43057742	682059644	00749c64ae6c_000_0000000003_0000065636	32040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750239984	Alive	\N	43057742	682062006	00749c64ae6c_000_0000000003_0000065636	32100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240044	Alive	\N	43057984	682063657	00749c64ae6c_000_0000000003_0000065636	32160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240104	Alive	\N	43057984	682064903	00749c64ae6c_000_0000000003_0000065636	32220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240164	Alive	\N	43113911	682090023	00749c64ae6c_000_0000000003_0000065636	32280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240224	Alive	\N	43114346	682091636	00749c64ae6c_000_0000000003_0000065636	32340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240283	Alive	\N	43114504	682091815	00749c64ae6c_000_0000000003_0000065636	32400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240344	Alive	\N	43114599	682091986	00749c64ae6c_000_0000000003_0000065636	32460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240404	Alive	\N	43115088	682092868	00749c64ae6c_000_0000000003_0000065636	32520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240464	Alive	\N	43115315	682093151	00749c64ae6c_000_0000000003_0000065636	32580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240524	Alive	\N	43123199	682129293	00749c64ae6c_000_0000000003_0000065636	32640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240584	Alive	\N	43128121	682162593	00749c64ae6c_000_0000000003_0000065636	32700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240644	Alive	\N	43128815	682163468	00749c64ae6c_000_0000000003_0000065636	32760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240704	Alive	\N	43128815	682163468	00749c64ae6c_000_0000000003_0000065636	32820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240764	Alive	\N	43128991	682163768	00749c64ae6c_000_0000000003_0000065636	32880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240823	Alive	\N	43180037	682255217	00749c64ae6c_000_0000000003_0000065636	32940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240884	Alive	\N	43246757	682325754	00749c64ae6c_000_0000000003_0000065636	33000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750240944	Alive	\N	43247690	682328916	00749c64ae6c_000_0000000003_0000065636	33060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750241004	Alive	\N	43253541	682343887	00749c64ae6c_000_0000000003_0000065636	33120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750241064	Alive	\N	43263603	682376006	00749c64ae6c_000_0000000003_0000065636	33180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750241124	Alive	\N	43264358	682377670	00749c64ae6c_000_0000000003_0000065636	33240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750241184	Alive	\N	43264667	682378157	00749c64ae6c_000_0000000003_0000065636	33300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750241244	Alive	\N	43563027	685051689	00749c64ae6c_000_0000000003_0000065636	33360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750241304	Alive	\N	43577247	685073213	00749c64ae6c_000_0000000003_0000065636	33420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750241363	Alive	\N	43579360	685075689	00749c64ae6c_000_0000000003_0000065636	33480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750241424	Alive	\N	43786835	685216295	00749c64ae6c_000_0000000003_0000065636	33540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750241484	Alive	\N	43851827	685259516	00749c64ae6c_000_0000000003_0000065636	33600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750241544	Alive	\N	43921981	685299157	00749c64ae6c_000_0000000003_0000065636	33660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750241572	Stop	\N	43921981	685299157	00749c64ae6c_000_0000000003_0000065636	33688	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+testuser	1750293155	Start	\N	\N	\N	00749c646f48_000_0000000119_1750293153	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750293275	Stop	\N	43703	57905	00749c646f48_000_0000000119_1750293153	120	Session-Timeout	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750383412	Start	\N	\N	\N	00749c646f48_000_0000000130_1750383410	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+testuser	1750383416	Stop	\N	0	0	00749c646f48_000_0000000130_1750383410	4	User-Request	\N	1	192.168.90.107	\N	\N	\N	\N	00749c646f48:restricted	768cbfab2fda
+newuser	1750390146	Start	\N	\N	\N	00749c64ae6c_000_0000000007_0000247898	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750390157	Stop	\N	0	0	00749c64ae6c_000_0000000007_0000247898	11	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750642242	Start	\N	\N	\N	00749c64ae6c_000_0000000009_0000499988	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750642302	Alive	\N	0	0	00749c64ae6c_000_0000000009_0000499988	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750642362	Alive	\N	76882	123735	00749c64ae6c_000_0000000009_0000499988	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750642422	Alive	\N	85965	141699	00749c64ae6c_000_0000000009_0000499988	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750642482	Alive	\N	90439	151670	00749c64ae6c_000_0000000009_0000499988	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750642495	Stop	\N	90439	151670	00749c64ae6c_000_0000000009_0000499988	254	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750727234	Start	\N	\N	\N	00749c64ae6c_000_0000000011_0000584977	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750727243	Stop	\N	0	0	00749c64ae6c_000_0000000011_0000584977	8	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750735738	Alive	\N	0	0	00749c64ae6c_000_0000000012_0000593428	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750735798	Alive	\N	2425817	101883619	00749c64ae6c_000_0000000012_0000593428	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750735857	Alive	\N	3937725	168621024	00749c64ae6c_000_0000000012_0000593428	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750735918	Alive	\N	6211428	270445739	00749c64ae6c_000_0000000012_0000593428	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750735978	Alive	\N	8012865	354029798	00749c64ae6c_000_0000000012_0000593428	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736038	Alive	\N	9205010	406905446	00749c64ae6c_000_0000000012_0000593428	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736098	Alive	\N	11108796	494840661	00749c64ae6c_000_0000000012_0000593428	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736158	Alive	\N	13762522	609934382	00749c64ae6c_000_0000000012_0000593428	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736218	Alive	\N	16761205	746830065	00749c64ae6c_000_0000000012_0000593428	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736277	Alive	\N	19177111	854681365	00749c64ae6c_000_0000000012_0000593428	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736338	Alive	\N	21974625	981291676	00749c64ae6c_000_0000000012_0000593428	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736398	Alive	\N	24744987	1106229430	00749c64ae6c_000_0000000012_0000593428	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736458	Alive	\N	27434608	1225723993	00749c64ae6c_000_0000000012_0000593428	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736518	Alive	\N	29761546	1328762363	00749c64ae6c_000_0000000012_0000593428	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736578	Alive	\N	32596326	1457812411	00749c64ae6c_000_0000000012_0000593428	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736637	Alive	\N	35695531	1601271770	00749c64ae6c_000_0000000012_0000593428	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736698	Alive	\N	38348708	1719984944	00749c64ae6c_000_0000000012_0000593428	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736758	Alive	\N	41339036	1855268575	00749c64ae6c_000_0000000012_0000593428	1080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736818	Alive	\N	43480464	1949480399	00749c64ae6c_000_0000000012_0000593428	1140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736878	Alive	\N	46427516	2086034470	00749c64ae6c_000_0000000012_0000593428	1200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736938	Alive	\N	48149764	2160009204	00749c64ae6c_000_0000000012_0000593428	1260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750736997	Alive	\N	50638684	2273907936	00749c64ae6c_000_0000000012_0000593428	1320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737058	Alive	\N	53813635	2420403022	00749c64ae6c_000_0000000012_0000593428	1380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737123	Alive	\N	56998716	2568783712	00749c64ae6c_000_0000000012_0000593428	1440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737178	Alive	\N	59931180	2705785137	00749c64ae6c_000_0000000012_0000593428	1500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737238	Alive	\N	63291613	2858655904	00749c64ae6c_000_0000000012_0000593428	1560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737303	Alive	\N	66126718	2991097661	00749c64ae6c_000_0000000012_0000593428	1620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737357	Alive	\N	69282793	3141421049	00749c64ae6c_000_0000000012_0000593428	1680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737418	Alive	\N	72202574	3273998247	00749c64ae6c_000_0000000012_0000593428	1740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737478	Alive	\N	75194481	3410098042	00749c64ae6c_000_0000000012_0000593428	1800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737538	Alive	\N	78370414	3555488462	00749c64ae6c_000_0000000012_0000593428	1860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737598	Alive	\N	81336679	3694330714	00749c64ae6c_000_0000000012_0000593428	1920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737658	Alive	\N	84179117	3824475786	00749c64ae6c_000_0000000012_0000593428	1980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737717	Alive	\N	87027003	3955647261	00749c64ae6c_000_0000000012_0000593428	2040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737778	Alive	\N	89983507	4088358044	00749c64ae6c_000_0000000012_0000593428	2100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737838	Alive	\N	92688356	4217611365	00749c64ae6c_000_0000000012_0000593428	2160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737898	Alive	\N	94835012	19442549	00749c64ae6c_000_0000000012_0000593428	2220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750737958	Alive	\N	96160724	85343760	00749c64ae6c_000_0000000012_0000593428	2280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738018	Alive	\N	96692733	129573333	00749c64ae6c_000_0000000012_0000593428	2340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738078	Alive	\N	97273399	177072333	00749c64ae6c_000_0000000012_0000593428	2400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738138	Alive	\N	97651113	204471705	00749c64ae6c_000_0000000012_0000593428	2460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738197	Alive	\N	98096918	238184744	00749c64ae6c_000_0000000012_0000593428	2520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738258	Alive	\N	98587091	276426054	00749c64ae6c_000_0000000012_0000593428	2580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738318	Alive	\N	99207129	326984626	00749c64ae6c_000_0000000012_0000593428	2640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738378	Alive	\N	99864178	365794517	00749c64ae6c_000_0000000012_0000593428	2700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738438	Alive	\N	99931086	365999976	00749c64ae6c_000_0000000012_0000593428	2760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738498	Alive	\N	100374977	374524560	00749c64ae6c_000_0000000012_0000593428	2820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738558	Alive	\N	100407526	374832796	00749c64ae6c_000_0000000012_0000593428	2880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738618	Alive	\N	100483289	375215879	00749c64ae6c_000_0000000012_0000593428	2940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738677	Alive	\N	100499072	375463798	00749c64ae6c_000_0000000012_0000593428	3000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738738	Alive	\N	100730372	376140378	00749c64ae6c_000_0000000012_0000593428	3060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738798	Alive	\N	100866809	376463383	00749c64ae6c_000_0000000012_0000593428	3120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738858	Alive	\N	100875482	376474503	00749c64ae6c_000_0000000012_0000593428	3180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738918	Alive	\N	100934424	376527175	00749c64ae6c_000_0000000012_0000593428	3240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750738978	Alive	\N	100940012	376536460	00749c64ae6c_000_0000000012_0000593428	3300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739038	Alive	\N	100940186	376536790	00749c64ae6c_000_0000000012_0000593428	3360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739098	Alive	\N	100940691	376539528	00749c64ae6c_000_0000000012_0000593428	3420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739158	Alive	\N	100941537	376540703	00749c64ae6c_000_0000000012_0000593428	3480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739217	Alive	\N	100941710	376540979	00749c64ae6c_000_0000000012_0000593428	3540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739278	Alive	\N	100941710	376540979	00749c64ae6c_000_0000000012_0000593428	3600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739338	Alive	\N	100960344	376573212	00749c64ae6c_000_0000000012_0000593428	3660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739398	Alive	\N	100960896	376573893	00749c64ae6c_000_0000000012_0000593428	3720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739458	Alive	\N	101003636	376624716	00749c64ae6c_000_0000000012_0000593428	3780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739518	Alive	\N	101003894	376625073	00749c64ae6c_000_0000000012_0000593428	3840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739578	Alive	\N	101003894	376625073	00749c64ae6c_000_0000000012_0000593428	3900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739638	Alive	\N	101004212	376625535	00749c64ae6c_000_0000000012_0000593428	3960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739698	Alive	\N	101004793	376626492	00749c64ae6c_000_0000000012_0000593428	4020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739757	Alive	\N	101005094	376626670	00749c64ae6c_000_0000000012_0000593428	4080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739818	Alive	\N	101036146	376658378	00749c64ae6c_000_0000000012_0000593428	4140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739878	Alive	\N	101039171	376666858	00749c64ae6c_000_0000000012_0000593428	4200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739938	Alive	\N	101039520	376667478	00749c64ae6c_000_0000000012_0000593428	4260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750739998	Alive	\N	101039681	376667649	00749c64ae6c_000_0000000012_0000593428	4320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740058	Alive	\N	101351369	377613977	00749c64ae6c_000_0000000012_0000593428	4380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740118	Alive	\N	101566327	378272195	00749c64ae6c_000_0000000012_0000593428	4440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740178	Alive	\N	101582022	378296937	00749c64ae6c_000_0000000012_0000593428	4500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740238	Alive	\N	101632365	378442603	00749c64ae6c_000_0000000012_0000593428	4560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740297	Alive	\N	101669896	378522232	00749c64ae6c_000_0000000012_0000593428	4620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740358	Alive	\N	101724134	378749542	00749c64ae6c_000_0000000012_0000593428	4680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740418	Alive	\N	101825353	378887336	00749c64ae6c_000_0000000012_0000593428	4740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740478	Alive	\N	102123221	379244890	00749c64ae6c_000_0000000012_0000593428	4800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740538	Alive	\N	102379335	379575626	00749c64ae6c_000_0000000012_0000593428	4860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740598	Alive	\N	102605266	379875565	00749c64ae6c_000_0000000012_0000593428	4920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740658	Alive	\N	102845902	380283343	00749c64ae6c_000_0000000012_0000593428	4980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740718	Alive	\N	103128921	380628451	00749c64ae6c_000_0000000012_0000593428	5040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740777	Alive	\N	103429760	380958027	00749c64ae6c_000_0000000012_0000593428	5100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740838	Alive	\N	103721827	381272775	00749c64ae6c_000_0000000012_0000593428	5160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740898	Alive	\N	104001757	381598888	00749c64ae6c_000_0000000012_0000593428	5220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750740958	Alive	\N	104157843	381868602	00749c64ae6c_000_0000000012_0000593428	5280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741018	Alive	\N	104425392	382195006	00749c64ae6c_000_0000000012_0000593428	5340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741078	Alive	\N	104568445	382492057	00749c64ae6c_000_0000000012_0000593428	5400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741138	Alive	\N	104825254	382781548	00749c64ae6c_000_0000000012_0000593428	5460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741198	Alive	\N	105065492	383154052	00749c64ae6c_000_0000000012_0000593428	5520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741258	Alive	\N	105183025	383526965	00749c64ae6c_000_0000000012_0000593428	5580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741317	Alive	\N	105209493	383562998	00749c64ae6c_000_0000000012_0000593428	5640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741378	Alive	\N	105254449	383751302	00749c64ae6c_000_0000000012_0000593428	5700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741438	Alive	\N	105330269	383843037	00749c64ae6c_000_0000000012_0000593428	5760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741498	Alive	\N	105509557	384293479	00749c64ae6c_000_0000000012_0000593428	5820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741558	Alive	\N	105765412	384687355	00749c64ae6c_000_0000000012_0000593428	5880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741618	Alive	\N	105999215	385077208	00749c64ae6c_000_0000000012_0000593428	5940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741678	Alive	\N	106241667	385465517	00749c64ae6c_000_0000000012_0000593428	6000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741738	Alive	\N	106494995	385853498	00749c64ae6c_000_0000000012_0000593428	6060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741797	Alive	\N	106692695	386181531	00749c64ae6c_000_0000000012_0000593428	6120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741858	Alive	\N	106860228	386517091	00749c64ae6c_000_0000000012_0000593428	6180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741918	Alive	\N	107022471	386833683	00749c64ae6c_000_0000000012_0000593428	6240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750741978	Alive	\N	107196667	387102545	00749c64ae6c_000_0000000012_0000593428	6300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742038	Alive	\N	107438358	387624037	00749c64ae6c_000_0000000012_0000593428	6360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742098	Alive	\N	107776038	388053736	00749c64ae6c_000_0000000012_0000593428	6420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742158	Alive	\N	107908061	388274427	00749c64ae6c_000_0000000012_0000593428	6480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742218	Alive	\N	108116760	388589139	00749c64ae6c_000_0000000012_0000593428	6540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742278	Alive	\N	108337220	388888161	00749c64ae6c_000_0000000012_0000593428	6600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742337	Alive	\N	108565290	389215753	00749c64ae6c_000_0000000012_0000593428	6660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742398	Alive	\N	108764091	389529872	00749c64ae6c_000_0000000012_0000593428	6720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742458	Alive	\N	108974402	389793726	00749c64ae6c_000_0000000012_0000593428	6780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742518	Alive	\N	109151350	390113384	00749c64ae6c_000_0000000012_0000593428	6840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742578	Alive	\N	109328994	390729291	00749c64ae6c_000_0000000012_0000593428	6900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742638	Alive	\N	109682058	393417343	00749c64ae6c_000_0000000012_0000593428	6960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742698	Alive	\N	110037861	393525965	00749c64ae6c_000_0000000012_0000593428	7020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742758	Alive	\N	110048757	393538086	00749c64ae6c_000_0000000012_0000593428	7080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742817	Alive	\N	110049038	393538257	00749c64ae6c_000_0000000012_0000593428	7140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742878	Alive	\N	110050352	393539850	00749c64ae6c_000_0000000012_0000593428	7200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742938	Alive	\N	110050650	393540032	00749c64ae6c_000_0000000012_0000593428	7260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750742998	Alive	\N	110050982	393542706	00749c64ae6c_000_0000000012_0000593428	7320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743058	Alive	\N	110052418	393544134	00749c64ae6c_000_0000000012_0000593428	7380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743118	Alive	\N	110052418	393544134	00749c64ae6c_000_0000000012_0000593428	7440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743178	Alive	\N	110052418	393544134	00749c64ae6c_000_0000000012_0000593428	7500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743238	Alive	\N	110052418	393544134	00749c64ae6c_000_0000000012_0000593428	7560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743298	Alive	\N	110052418	393544134	00749c64ae6c_000_0000000012_0000593428	7620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743357	Alive	\N	110093868	393627118	00749c64ae6c_000_0000000012_0000593428	7680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743418	Alive	\N	110093947	393627213	00749c64ae6c_000_0000000012_0000593428	7740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743478	Alive	\N	110127060	393660476	00749c64ae6c_000_0000000012_0000593428	7800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743538	Alive	\N	110157891	393691644	00749c64ae6c_000_0000000012_0000593428	7860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743598	Alive	\N	110177727	393723088	00749c64ae6c_000_0000000012_0000593428	7920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743658	Alive	\N	110178028	393726056	00749c64ae6c_000_0000000012_0000593428	7980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743718	Alive	\N	110188283	393736039	00749c64ae6c_000_0000000012_0000593428	8040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743778	Alive	\N	110188283	393737401	00749c64ae6c_000_0000000012_0000593428	8100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743838	Alive	\N	110188444	393737572	00749c64ae6c_000_0000000012_0000593428	8160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743897	Alive	\N	110189215	393739354	00749c64ae6c_000_0000000012_0000593428	8220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750743958	Alive	\N	110189916	393739876	00749c64ae6c_000_0000000012_0000593428	8280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744018	Alive	\N	110190247	393744326	00749c64ae6c_000_0000000012_0000593428	8340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744078	Alive	\N	110190313	393744438	00749c64ae6c_000_0000000012_0000593428	8400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744138	Alive	\N	110356808	394054463	00749c64ae6c_000_0000000012_0000593428	8460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744198	Alive	\N	110778181	403425573	00749c64ae6c_000_0000000012_0000593428	8520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744258	Alive	\N	111687012	430520909	00749c64ae6c_000_0000000012_0000593428	8580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744318	Alive	\N	112310344	434129837	00749c64ae6c_000_0000000012_0000593428	8640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744377	Alive	\N	112576870	440102690	00749c64ae6c_000_0000000012_0000593428	8700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744438	Alive	\N	112706331	440216369	00749c64ae6c_000_0000000012_0000593428	8760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744498	Alive	\N	112707061	440217099	00749c64ae6c_000_0000000012_0000593428	8820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744558	Alive	\N	112708744	440218618	00749c64ae6c_000_0000000012_0000593428	8880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744618	Alive	\N	112779729	440268002	00749c64ae6c_000_0000000012_0000593428	8940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744678	Alive	\N	112835802	440359522	00749c64ae6c_000_0000000012_0000593428	9000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744738	Alive	\N	112896708	440380608	00749c64ae6c_000_0000000012_0000593428	9060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744798	Alive	\N	112908016	440388888	00749c64ae6c_000_0000000012_0000593428	9120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744858	Alive	\N	112908658	440389303	00749c64ae6c_000_0000000012_0000593428	9180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744917	Alive	\N	112910071	440391738	00749c64ae6c_000_0000000012_0000593428	9240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750744978	Alive	\N	112910125	440391843	00749c64ae6c_000_0000000012_0000593428	9300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745038	Alive	\N	112910441	440392467	00749c64ae6c_000_0000000012_0000593428	9360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745098	Alive	\N	112910844	440392817	00749c64ae6c_000_0000000012_0000593428	9420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745158	Alive	\N	112912014	440393943	00749c64ae6c_000_0000000012_0000593428	9480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745218	Alive	\N	112917187	440407036	00749c64ae6c_000_0000000012_0000593428	9540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745278	Alive	\N	112917373	440407353	00749c64ae6c_000_0000000012_0000593428	9600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745338	Alive	\N	112917373	440407353	00749c64ae6c_000_0000000012_0000593428	9660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745397	Alive	\N	112959115	440461511	00749c64ae6c_000_0000000012_0000593428	9720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745457	Alive	\N	112959414	440461755	00749c64ae6c_000_0000000012_0000593428	9780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745518	Alive	\N	112959725	440462166	00749c64ae6c_000_0000000012_0000593428	9840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745578	Alive	\N	112959817	440462345	00749c64ae6c_000_0000000012_0000593428	9900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745638	Alive	\N	112960033	440462901	00749c64ae6c_000_0000000012_0000593428	9960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745698	Alive	\N	112960194	440463072	00749c64ae6c_000_0000000012_0000593428	10020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745758	Alive	\N	112960939	440465233	00749c64ae6c_000_0000000012_0000593428	10080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745818	Alive	\N	112961270	440465865	00749c64ae6c_000_0000000012_0000593428	10140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745878	Alive	\N	112961336	440465977	00749c64ae6c_000_0000000012_0000593428	10200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745938	Alive	\N	112961336	440465977	00749c64ae6c_000_0000000012_0000593428	10260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750745997	Alive	\N	112961497	440466148	00749c64ae6c_000_0000000012_0000593428	10320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746058	Alive	\N	113319507	442984565	00749c64ae6c_000_0000000012_0000593428	10380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746118	Alive	\N	113685377	448347027	00749c64ae6c_000_0000000012_0000593428	10440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746178	Alive	\N	114153525	458575616	00749c64ae6c_000_0000000012_0000593428	10500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746238	Alive	\N	114505444	471580871	00749c64ae6c_000_0000000012_0000593428	10560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746298	Alive	\N	115052319	476142641	00749c64ae6c_000_0000000012_0000593428	10620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746358	Alive	\N	115665088	503418836	00749c64ae6c_000_0000000012_0000593428	10680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746418	Alive	\N	115705094	503745990	00749c64ae6c_000_0000000012_0000593428	10740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746477	Alive	\N	115726747	503771891	00749c64ae6c_000_0000000012_0000593428	10800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746537	Alive	\N	115766768	503894808	00749c64ae6c_000_0000000012_0000593428	10860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746598	Alive	\N	115860206	504033062	00749c64ae6c_000_0000000012_0000593428	10920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746658	Alive	\N	116108116	504327477	00749c64ae6c_000_0000000012_0000593428	10980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746718	Alive	\N	116362068	504614413	00749c64ae6c_000_0000000012_0000593428	11040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746778	Alive	\N	116616420	504918335	00749c64ae6c_000_0000000012_0000593428	11100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746838	Alive	\N	116845734	505199083	00749c64ae6c_000_0000000012_0000593428	11160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746898	Alive	\N	117096924	505491113	00749c64ae6c_000_0000000012_0000593428	11220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750746958	Alive	\N	117253972	505734822	00749c64ae6c_000_0000000012_0000593428	11280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747017	Alive	\N	117460988	506017946	00749c64ae6c_000_0000000012_0000593428	11340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747078	Alive	\N	117693503	506318580	00749c64ae6c_000_0000000012_0000593428	11400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747138	Alive	\N	117977250	506606975	00749c64ae6c_000_0000000012_0000593428	11460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747198	Alive	\N	118164157	506855277	00749c64ae6c_000_0000000012_0000593428	11520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747258	Alive	\N	118447100	507151664	00749c64ae6c_000_0000000012_0000593428	11580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747318	Alive	\N	118727798	507430126	00749c64ae6c_000_0000000012_0000593428	11640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747378	Alive	\N	119003019	507701313	00749c64ae6c_000_0000000012_0000593428	11700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747438	Alive	\N	119237696	507950346	00749c64ae6c_000_0000000012_0000593428	11760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747497	Alive	\N	119424212	508413941	00749c64ae6c_000_0000000012_0000593428	11820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747557	Alive	\N	120014362	508883815	00749c64ae6c_000_0000000012_0000593428	11880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747618	Alive	\N	120205007	509118314	00749c64ae6c_000_0000000012_0000593428	11940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747678	Alive	\N	120269669	509193510	00749c64ae6c_000_0000000012_0000593428	12000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747738	Alive	\N	120271550	509195018	00749c64ae6c_000_0000000012_0000593428	12060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747798	Alive	\N	120273311	509196517	00749c64ae6c_000_0000000012_0000593428	12120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747858	Alive	\N	120283961	509205134	00749c64ae6c_000_0000000012_0000593428	12180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747918	Alive	\N	120561348	512625751	00749c64ae6c_000_0000000012_0000593428	12240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750747978	Alive	\N	121208483	532247722	00749c64ae6c_000_0000000012_0000593428	12300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748037	Alive	\N	121941731	552990165	00749c64ae6c_000_0000000012_0000593428	12360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748098	Alive	\N	122527333	566542518	00749c64ae6c_000_0000000012_0000593428	12420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748158	Alive	\N	122648810	568542412	00749c64ae6c_000_0000000012_0000593428	12480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748218	Alive	\N	122653877	568551521	00749c64ae6c_000_0000000012_0000593428	12540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748278	Alive	\N	122655631	568552873	00749c64ae6c_000_0000000012_0000593428	12600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748338	Alive	\N	122658356	568554601	00749c64ae6c_000_0000000012_0000593428	12660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748398	Alive	\N	122712219	568570681	00749c64ae6c_000_0000000012_0000593428	12720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748458	Alive	\N	122714508	568572471	00749c64ae6c_000_0000000012_0000593428	12780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748518	Alive	\N	122716561	568574295	00749c64ae6c_000_0000000012_0000593428	12840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748577	Alive	\N	123162452	573838187	00749c64ae6c_000_0000000012_0000593428	12900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748638	Alive	\N	123162626	573838452	00749c64ae6c_000_0000000012_0000593428	12960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748698	Alive	\N	123173154	573844981	00749c64ae6c_000_0000000012_0000593428	13020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748758	Alive	\N	123177166	573848021	00749c64ae6c_000_0000000012_0000593428	13080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748818	Alive	\N	123627804	590959780	00749c64ae6c_000_0000000012_0000593428	13140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748878	Alive	\N	123763830	596253783	00749c64ae6c_000_0000000012_0000593428	13200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748938	Alive	\N	123782773	596270834	00749c64ae6c_000_0000000012_0000593428	13260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750748998	Alive	\N	123785507	596273057	00749c64ae6c_000_0000000012_0000593428	13320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750749057	Alive	\N	123936456	596495490	00749c64ae6c_000_0000000012_0000593428	13380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750749118	Alive	\N	123941539	596499315	00749c64ae6c_000_0000000012_0000593428	13440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750749178	Alive	\N	123964543	596522012	00749c64ae6c_000_0000000012_0000593428	13500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750749238	Alive	\N	123966918	596523970	00749c64ae6c_000_0000000012_0000593428	13560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750749293	Stop	\N	124144419	597380659	00749c64ae6c_000_0000000012_0000593428	13615	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750749650	Start	\N	\N	\N	00749c64ae6c_000_0000000013_0000607389	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750749711	Alive	\N	29933	73063	00749c64ae6c_000_0000000013_0000607389	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750749734	Stop	\N	29933	73063	00749c64ae6c_000_0000000013_0000607389	84	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750750024	Start	\N	\N	\N	00749c64ae6c_000_0000000015_0000607767	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750750083	Stop	\N	0	0	00749c64ae6c_000_0000000015_0000607767	60	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750818363	Start	\N	\N	\N	00749c64ae6c_000_0000000021_0000676114	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750818408	Stop	\N	0	0	00749c64ae6c_000_0000000021_0000676114	45	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750820322	Start	\N	\N	\N	00749c64ae6c_000_0000000023_0000678073	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750820383	Alive	\N	0	0	00749c64ae6c_000_0000000023_0000678073	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750820442	Alive	\N	39835	84467	00749c64ae6c_000_0000000023_0000678073	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750820502	Alive	\N	69966	142827	00749c64ae6c_000_0000000023_0000678073	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750820562	Alive	\N	78029	156916	00749c64ae6c_000_0000000023_0000678073	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750820573	Alive	\N	78029	156916	00749c64ae6c_000_0000000023_0000678073	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750820622	Alive	\N	78436	157447	00749c64ae6c_000_0000000023_0000678073	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750820682	Alive	\N	79935	159017	00749c64ae6c_000_0000000023_0000678073	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750820742	Alive	\N	96629	189231	00749c64ae6c_000_0000000023_0000678073	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750820802	Alive	\N	107753	207881	00749c64ae6c_000_0000000023_0000678073	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750820862	Alive	\N	108791	217299	00749c64ae6c_000_0000000023_0000678073	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750820922	Alive	\N	117923	229288	00749c64ae6c_000_0000000023_0000678073	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750820982	Stop	\N	118639	230014	00749c64ae6c_000_0000000023_0000678073	659	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750821287	Start	\N	\N	\N	00749c64ae6c_000_0000000024_0000679038	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750821347	Alive	\N	29558	57625	00749c64ae6c_000_0000000024_0000679038	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750821408	Alive	\N	32946	59827	00749c64ae6c_000_0000000024_0000679038	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750821467	Alive	\N	32946	59827	00749c64ae6c_000_0000000024_0000679038	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750821532	Alive	\N	94532	689303	00749c64ae6c_000_0000000024_0000679038	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750821587	Alive	\N	109226	710856	00749c64ae6c_000_0000000024_0000679038	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750821647	Alive	\N	114070	714685	00749c64ae6c_000_0000000024_0000679038	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750821707	Alive	\N	142553	762902	00749c64ae6c_000_0000000024_0000679038	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750821767	Alive	\N	149841	776842	00749c64ae6c_000_0000000024_0000679038	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750821827	Alive	\N	149985	777064	00749c64ae6c_000_0000000024_0000679038	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750821887	Alive	\N	152123	780479	00749c64ae6c_000_0000000024_0000679038	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750821948	Alive	\N	153737	783312	00749c64ae6c_000_0000000024_0000679038	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822007	Alive	\N	153737	783312	00749c64ae6c_000_0000000024_0000679038	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822067	Alive	\N	153978	783624	00749c64ae6c_000_0000000024_0000679038	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822127	Alive	\N	154193	783908	00749c64ae6c_000_0000000024_0000679038	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822187	Alive	\N	154193	783908	00749c64ae6c_000_0000000024_0000679038	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822247	Alive	\N	256790	882142	00749c64ae6c_000_0000000024_0000679038	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822307	Alive	\N	257413	882743	00749c64ae6c_000_0000000024_0000679038	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822367	Alive	\N	257628	882980	00749c64ae6c_000_0000000024_0000679038	1080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822427	Alive	\N	259275	885233	00749c64ae6c_000_0000000024_0000679038	1140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822487	Alive	\N	259275	885233	00749c64ae6c_000_0000000024_0000679038	1200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822547	Alive	\N	259516	885485	00749c64ae6c_000_0000000024_0000679038	1260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822607	Alive	\N	260044	885946	00749c64ae6c_000_0000000024_0000679038	1320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822665	Stop	\N	260044	885946	00749c64ae6c_000_0000000024_0000679038	1378	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822852	Start	\N	\N	\N	00749c64ae6c_000_0000000026_0000680595	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822911	Alive	\N	42850	84323	00749c64ae6c_000_0000000026_0000680595	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750822918	Stop	\N	42850	84323	00749c64ae6c_000_0000000026_0000680595	67	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823075	Start	\N	\N	\N	00749c64ae6c_000_0000000027_0000680826	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823135	Alive	\N	0	0	00749c64ae6c_000_0000000027_0000680826	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823173	Stop	\N	77514	314959	00749c64ae6c_000_0000000027_0000680826	98	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823377	Start	\N	\N	\N	00749c64ae6c_000_0000000028_0000681128	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823437	Alive	\N	0	0	00749c64ae6c_000_0000000028_0000681128	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823497	Alive	\N	25029	38800	00749c64ae6c_000_0000000028_0000681128	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823544	Stop	\N	39401	64769	00749c64ae6c_000_0000000028_0000681128	167	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823577	Start	\N	\N	\N	00749c64ae6c_000_0000000029_0000681324	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823636	Alive	\N	0	0	00749c64ae6c_000_0000000029_0000681324	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823696	Alive	\N	174042	1552735	00749c64ae6c_000_0000000029_0000681324	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823756	Alive	\N	1148477	18586404	00749c64ae6c_000_0000000029_0000681324	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823816	Alive	\N	1537274	29750287	00749c64ae6c_000_0000000029_0000681324	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823876	Alive	\N	2192269	39738970	00749c64ae6c_000_0000000029_0000681324	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823936	Alive	\N	2555164	49161835	00749c64ae6c_000_0000000029_0000681324	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750823996	Alive	\N	2556370	49163165	00749c64ae6c_000_0000000029_0000681324	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824056	Alive	\N	2561493	49168178	00749c64ae6c_000_0000000029_0000681324	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824116	Alive	\N	2561656	49168364	00749c64ae6c_000_0000000029_0000681324	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824176	Alive	\N	2832665	54799990	00749c64ae6c_000_0000000029_0000681324	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824236	Alive	\N	2943194	60133085	00749c64ae6c_000_0000000029_0000681324	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824296	Alive	\N	3000109	62383155	00749c64ae6c_000_0000000029_0000681324	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824356	Alive	\N	3113867	62856216	00749c64ae6c_000_0000000029_0000681324	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824416	Alive	\N	3348194	75797476	00749c64ae6c_000_0000000029_0000681324	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824476	Alive	\N	3396611	76119256	00749c64ae6c_000_0000000029_0000681324	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824536	Alive	\N	3413190	76162478	00749c64ae6c_000_0000000029_0000681324	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824596	Alive	\N	3445462	76199738	00749c64ae6c_000_0000000029_0000681324	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824656	Alive	\N	3660154	78851359	00749c64ae6c_000_0000000029_0000681324	1080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824716	Alive	\N	3961380	95061299	00749c64ae6c_000_0000000029_0000681324	1140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824776	Alive	\N	4106316	105765863	00749c64ae6c_000_0000000029_0000681324	1200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824836	Alive	\N	4172593	109028805	00749c64ae6c_000_0000000029_0000681324	1260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824896	Alive	\N	4311264	113209172	00749c64ae6c_000_0000000029_0000681324	1320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750824956	Alive	\N	4415031	114457931	00749c64ae6c_000_0000000029_0000681324	1380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825016	Alive	\N	4477226	115841152	00749c64ae6c_000_0000000029_0000681324	1440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825076	Alive	\N	4532807	116493872	00749c64ae6c_000_0000000029_0000681324	1500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825136	Alive	\N	4545963	116508709	00749c64ae6c_000_0000000029_0000681324	1560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825196	Alive	\N	4572281	116549449	00749c64ae6c_000_0000000029_0000681324	1620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825256	Alive	\N	4572854	116550030	00749c64ae6c_000_0000000029_0000681324	1680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825316	Alive	\N	4573263	116550536	00749c64ae6c_000_0000000029_0000681324	1740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825376	Alive	\N	4573420	116550714	00749c64ae6c_000_0000000029_0000681324	1800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825436	Alive	\N	4573907	116551076	00749c64ae6c_000_0000000029_0000681324	1860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825496	Alive	\N	4575345	116557691	00749c64ae6c_000_0000000029_0000681324	1920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825556	Alive	\N	4575941	116558226	00749c64ae6c_000_0000000029_0000681324	1980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825617	Alive	\N	4575995	116558327	00749c64ae6c_000_0000000029_0000681324	2040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825676	Alive	\N	4616638	116591264	00749c64ae6c_000_0000000029_0000681324	2100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825736	Alive	\N	4617977	116592662	00749c64ae6c_000_0000000029_0000681324	2160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825796	Alive	\N	4618097	116592868	00749c64ae6c_000_0000000029_0000681324	2220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825856	Alive	\N	4619614	116599220	00749c64ae6c_000_0000000029_0000681324	2280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825916	Alive	\N	4619777	116599406	00749c64ae6c_000_0000000029_0000681324	2340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750825976	Alive	\N	4839871	120858341	00749c64ae6c_000_0000000029_0000681324	2400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826036	Alive	\N	5218632	133894357	00749c64ae6c_000_0000000029_0000681324	2460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826097	Alive	\N	5349351	137577673	00749c64ae6c_000_0000000029_0000681324	2520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826156	Alive	\N	5442039	141834648	00749c64ae6c_000_0000000029_0000681324	2580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826216	Alive	\N	5484782	141875371	00749c64ae6c_000_0000000029_0000681324	2640	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826276	Alive	\N	6013767	145878092	00749c64ae6c_000_0000000029_0000681324	2700	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826336	Alive	\N	6076189	146002064	00749c64ae6c_000_0000000029_0000681324	2760	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826396	Alive	\N	6209175	147174212	00749c64ae6c_000_0000000029_0000681324	2820	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826456	Alive	\N	6282343	147389529	00749c64ae6c_000_0000000029_0000681324	2880	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826516	Alive	\N	6312390	147423427	00749c64ae6c_000_0000000029_0000681324	2940	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826576	Alive	\N	6453398	147635934	00749c64ae6c_000_0000000029_0000681324	3000	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826637	Alive	\N	6553011	147771434	00749c64ae6c_000_0000000029_0000681324	3060	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826696	Alive	\N	6794602	148021075	00749c64ae6c_000_0000000029_0000681324	3120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826756	Alive	\N	7027661	149449890	00749c64ae6c_000_0000000029_0000681324	3180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826816	Alive	\N	7251270	149698413	00749c64ae6c_000_0000000029_0000681324	3240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826876	Alive	\N	7534077	149970199	00749c64ae6c_000_0000000029_0000681324	3300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826936	Alive	\N	7780367	150221507	00749c64ae6c_000_0000000029_0000681324	3360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750826996	Alive	\N	8032787	150481958	00749c64ae6c_000_0000000029_0000681324	3420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827056	Alive	\N	8219506	150704046	00749c64ae6c_000_0000000029_0000681324	3480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827116	Alive	\N	8448905	150943167	00749c64ae6c_000_0000000029_0000681324	3540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827176	Alive	\N	8574153	151138515	00749c64ae6c_000_0000000029_0000681324	3600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827236	Alive	\N	8803032	151369780	00749c64ae6c_000_0000000029_0000681324	3660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827296	Alive	\N	9000321	151591218	00749c64ae6c_000_0000000029_0000681324	3720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827356	Alive	\N	9192532	151820809	00749c64ae6c_000_0000000029_0000681324	3780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827416	Alive	\N	9447499	152062080	00749c64ae6c_000_0000000029_0000681324	3840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827476	Alive	\N	9678394	152302237	00749c64ae6c_000_0000000029_0000681324	3900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827536	Alive	\N	9877170	152732669	00749c64ae6c_000_0000000029_0000681324	3960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827596	Alive	\N	9992320	152909471	00749c64ae6c_000_0000000029_0000681324	4020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827656	Alive	\N	10024491	152950727	00749c64ae6c_000_0000000029_0000681324	4080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827716	Alive	\N	10106313	153166944	00749c64ae6c_000_0000000029_0000681324	4140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827776	Alive	\N	10283222	153314934	00749c64ae6c_000_0000000029_0000681324	4200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827836	Alive	\N	10356376	153436368	00749c64ae6c_000_0000000029_0000681324	4260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827896	Alive	\N	10590405	153720281	00749c64ae6c_000_0000000029_0000681324	4320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750827956	Alive	\N	10800577	153998508	00749c64ae6c_000_0000000029_0000681324	4380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828016	Alive	\N	11078758	154283498	00749c64ae6c_000_0000000029_0000681324	4440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828076	Alive	\N	11341591	154585560	00749c64ae6c_000_0000000029_0000681324	4500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828136	Alive	\N	11613755	154874930	00749c64ae6c_000_0000000029_0000681324	4560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828196	Alive	\N	11786720	155125290	00749c64ae6c_000_0000000029_0000681324	4620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828256	Alive	\N	11952445	155358569	00749c64ae6c_000_0000000029_0000681324	4680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828316	Alive	\N	12147545	155616277	00749c64ae6c_000_0000000029_0000681324	4740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828376	Alive	\N	12381013	155885378	00749c64ae6c_000_0000000029_0000681324	4800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828436	Alive	\N	12645571	156142479	00749c64ae6c_000_0000000029_0000681324	4860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828496	Alive	\N	12928250	156441875	00749c64ae6c_000_0000000029_0000681324	4920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828556	Alive	\N	13163769	156706550	00749c64ae6c_000_0000000029_0000681324	4980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828616	Alive	\N	13312690	156922999	00749c64ae6c_000_0000000029_0000681324	5040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828676	Alive	\N	13515187	157181954	00749c64ae6c_000_0000000029_0000681324	5100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828736	Alive	\N	13843496	162288763	00749c64ae6c_000_0000000029_0000681324	5160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828796	Alive	\N	14242574	174059146	00749c64ae6c_000_0000000029_0000681324	5220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828856	Alive	\N	14491867	181840998	00749c64ae6c_000_0000000029_0000681324	5280	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828916	Alive	\N	14492028	181845238	00749c64ae6c_000_0000000029_0000681324	5340	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750828976	Alive	\N	14492496	181845976	00749c64ae6c_000_0000000029_0000681324	5400	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750829036	Alive	\N	14492591	181846147	00749c64ae6c_000_0000000029_0000681324	5460	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750829096	Alive	\N	14492591	181846147	00749c64ae6c_000_0000000029_0000681324	5520	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750829156	Alive	\N	14493689	181846817	00749c64ae6c_000_0000000029_0000681324	5580	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750829158	Stop	\N	14493689	181846817	00749c64ae6c_000_0000000029_0000681324	5582	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750829900	Start	\N	\N	\N	00749c64ae6c_000_0000000030_0000687651	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750829960	Alive	\N	0	0	00749c64ae6c_000_0000000030_0000687651	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750829970	Stop	\N	0	0	00749c64ae6c_000_0000000030_0000687651	70	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750830113	Start	\N	\N	\N	00749c64ae6c_000_0000000031_0000687864	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750830131	Stop	\N	0	0	00749c64ae6c_000_0000000031_0000687864	18	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750831217	Start	\N	\N	\N	00749c64ae6c_000_0000000032_0000688968	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750831277	Alive	\N	0	0	00749c64ae6c_000_0000000032_0000688968	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750831338	Alive	\N	41883	54038	00749c64ae6c_000_0000000032_0000688968	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750831395	Stop	\N	63316	85652	00749c64ae6c_000_0000000032_0000688968	177	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750831430	Start	\N	\N	\N	00749c64ae6c_000_0000000033_0000689181	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750831450	Stop	\N	0	0	00749c64ae6c_000_0000000033_0000689181	19	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750831757	Start	\N	\N	\N	00749c64ae6c_000_0000000034_0000689508	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750831817	Alive	\N	0	0	00749c64ae6c_000_0000000034_0000689508	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750831878	Alive	\N	40481	55643	00749c64ae6c_000_0000000034_0000689508	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750831913	Stop	\N	40852	56112	00749c64ae6c_000_0000000034_0000689508	156	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750832187	Start	\N	\N	\N	00749c64ae6c_000_0000000035_0000689938	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750832247	Alive	\N	0	0	00749c64ae6c_000_0000000035_0000689938	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750832307	Alive	\N	17161	26652	00749c64ae6c_000_0000000035_0000689938	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750832367	Alive	\N	17322	26823	00749c64ae6c_000_0000000035_0000689938	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750832422	Stop	\N	54979	248869	00749c64ae6c_000_0000000035_0000689938	235	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750832529	Start	\N	\N	\N	00749c64ae6c_000_0000000036_0000690280	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750832589	Alive	\N	0	0	00749c64ae6c_000_0000000036_0000690280	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750832649	Alive	\N	16829	26167	00749c64ae6c_000_0000000036_0000690280	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750832709	Alive	\N	16990	26338	00749c64ae6c_000_0000000036_0000690280	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750832769	Alive	\N	18562	27698	00749c64ae6c_000_0000000036_0000690280	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750832829	Alive	\N	29598	57955	00749c64ae6c_000_0000000036_0000690280	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750832889	Alive	\N	30141	58464	00749c64ae6c_000_0000000036_0000690280	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750832950	Alive	\N	30141	58464	00749c64ae6c_000_0000000036_0000690280	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833009	Alive	\N	30302	58635	00749c64ae6c_000_0000000036_0000690280	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833069	Alive	\N	30942	61478	00749c64ae6c_000_0000000036_0000690280	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833129	Alive	\N	30942	61478	00749c64ae6c_000_0000000036_0000690280	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833189	Alive	\N	37678	69012	00749c64ae6c_000_0000000036_0000690280	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833249	Alive	\N	37841	69198	00749c64ae6c_000_0000000036_0000690280	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833309	Alive	\N	37936	69369	00749c64ae6c_000_0000000036_0000690280	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833369	Alive	\N	38237	69547	00749c64ae6c_000_0000000036_0000690280	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833429	Alive	\N	38537	69916	00749c64ae6c_000_0000000036_0000690280	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833490	Alive	\N	38632	70087	00749c64ae6c_000_0000000036_0000690280	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833549	Alive	\N	96803	108339	00749c64ae6c_000_0000000036_0000690280	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833609	Alive	\N	97127	108696	00749c64ae6c_000_0000000036_0000690280	1080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833669	Alive	\N	124261	133955	00749c64ae6c_000_0000000036_0000690280	1140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833729	Alive	\N	124532	134286	00749c64ae6c_000_0000000036_0000690280	1200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833789	Alive	\N	125760	140440	00749c64ae6c_000_0000000036_0000690280	1260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833849	Alive	\N	129287	149890	00749c64ae6c_000_0000000036_0000690280	1320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833909	Alive	\N	130690	156184	00749c64ae6c_000_0000000036_0000690280	1380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750833969	Alive	\N	178704	192762	00749c64ae6c_000_0000000036_0000690280	1440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750834029	Alive	\N	249022	230507	00749c64ae6c_000_0000000036_0000690280	1500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750834089	Alive	\N	249634	231287	00749c64ae6c_000_0000000036_0000690280	1560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750834149	Alive	\N	249634	231287	00749c64ae6c_000_0000000036_0000690280	1620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750834209	Alive	\N	249939	231736	00749c64ae6c_000_0000000036_0000690280	1680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1750834268	Stop	\N	250384	232168	00749c64ae6c_000_0000000036_0000690280	1739	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+charchel	1750991146	Start	\N	\N	\N	00749c64ae6c_000_0000000055_0000848896	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750991212	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750991267	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750991326	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750991386	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750991446	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750991506	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750991566	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750991632	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750991687	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750991747	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750991806	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750991866	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750991926	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750991986	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992046	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992107	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992167	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992227	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992286	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992352	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992406	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992466	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992526	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992587	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992651	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1500	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992707	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1560	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992766	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1620	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992826	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1680	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992886	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1740	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750992946	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1800	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750993006	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1860	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750993067	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1920	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750993127	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	1980	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750993187	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	2040	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750993246	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	2100	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750993306	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	2160	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750993366	Alive	\N	0	0	00749c64ae6c_000_0000000055_0000848896	2220	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1750993388	Stop	\N	0	0	00749c64ae6c_000_0000000055_0000848896	2241	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+newuser	1751592032	Start	\N	\N	\N	00749c64ae6c_000_0000000026_0000336004	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751592092	Alive	\N	47087	68802	00749c64ae6c_000_0000000026_0000336004	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751608072	Start	\N	\N	\N	00749c64ae6c_000_0000000057_0000352044	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751608088	Stop	\N	0	0	00749c64ae6c_000_0000000057_0000352044	15	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751608318	Start	\N	\N	\N	00749c64ae6c_000_0000000062_0000352290	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751608378	Alive	\N	0	0	00749c64ae6c_000_0000000062_0000352290	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751608427	Stop	\N	15059	30570	00749c64ae6c_000_0000000062_0000352290	110	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751869162	Start	\N	\N	\N	00749c64ae6c_000_0000000103_0000613134	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751869222	Alive	\N	0	0	00749c64ae6c_000_0000000103_0000613134	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751869282	Alive	\N	57569	138934	00749c64ae6c_000_0000000103_0000613134	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751869342	Alive	\N	64654	156738	00749c64ae6c_000_0000000103_0000613134	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751869402	Alive	\N	182369	480410	00749c64ae6c_000_0000000103_0000613134	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751869461	Alive	\N	303601	706556	00749c64ae6c_000_0000000103_0000613134	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751869762	Alive	\N	682857	1778857	00749c64ae6c_000_0000000103_0000613134	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751869822	Alive	\N	696808	1793132	00749c64ae6c_000_0000000103_0000613134	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751869882	Alive	\N	698521	1795450	00749c64ae6c_000_0000000103_0000613134	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751869941	Alive	\N	723230	1830629	00749c64ae6c_000_0000000103_0000613134	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751870002	Alive	\N	723811	1831309	00749c64ae6c_000_0000000103_0000613134	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751870062	Alive	\N	723811	1831309	00749c64ae6c_000_0000000103_0000613134	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751870127	Alive	\N	740742	1912562	00749c64ae6c_000_0000000103_0000613134	960	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751870182	Alive	\N	740796	1912737	00749c64ae6c_000_0000000103_0000613134	1020	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751870242	Alive	\N	793728	2067552	00749c64ae6c_000_0000000103_0000613134	1080	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751870302	Alive	\N	794469	2071120	00749c64ae6c_000_0000000103_0000613134	1140	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751870362	Alive	\N	794469	2075026	00749c64ae6c_000_0000000103_0000613134	1200	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751870422	Alive	\N	795049	2076077	00749c64ae6c_000_0000000103_0000613134	1260	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751870482	Alive	\N	795049	2076511	00749c64ae6c_000_0000000103_0000613134	1320	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751870541	Alive	\N	795157	2076789	00749c64ae6c_000_0000000103_0000613134	1380	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751870602	Alive	\N	795318	2077394	00749c64ae6c_000_0000000103_0000613134	1440	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751960640	Start	\N	\N	\N	00749c64ae6c_000_0000000184_0000704602	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751960700	Alive	\N	0	0	00749c64ae6c_000_0000000184_0000704602	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751960760	Alive	\N	29464	50297	00749c64ae6c_000_0000000184_0000704602	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1751960804	Stop	\N	569737	18659297	00749c64ae6c_000_0000000184_0000704602	164	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752022893	Start	\N	\N	\N	00749c64ae6c_000_0000000187_0000766828	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752022953	Alive	\N	0	0	00749c64ae6c_000_0000000187_0000766828	60	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023013	Alive	\N	449868	777733	00749c64ae6c_000_0000000187_0000766828	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023028	Alive	\N	449868	777733	00749c64ae6c_000_0000000187_0000766828	120	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023074	Alive	\N	958259	2886448	00749c64ae6c_000_0000000187_0000766828	180	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023134	Alive	\N	1083750	3255494	00749c64ae6c_000_0000000187_0000766828	240	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023193	Alive	\N	1199937	3353091	00749c64ae6c_000_0000000187_0000766828	300	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023253	Alive	\N	1201957	3354110	00749c64ae6c_000_0000000187_0000766828	360	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023313	Alive	\N	1203439	3355093	00749c64ae6c_000_0000000187_0000766828	420	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023373	Alive	\N	1635339	7587158	00749c64ae6c_000_0000000187_0000766828	480	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023433	Alive	\N	1738008	8404056	00749c64ae6c_000_0000000187_0000766828	540	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023493	Alive	\N	1738008	8404056	00749c64ae6c_000_0000000187_0000766828	600	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023554	Alive	\N	1767962	8578696	00749c64ae6c_000_0000000187_0000766828	660	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023614	Alive	\N	1768463	8580299	00749c64ae6c_000_0000000187_0000766828	720	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023673	Alive	\N	1769045	8580897	00749c64ae6c_000_0000000187_0000766828	780	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023733	Alive	\N	1769441	8581424	00749c64ae6c_000_0000000187_0000766828	840	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023793	Alive	\N	1770308	8582505	00749c64ae6c_000_0000000187_0000766828	900	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+newuser	1752023805	Stop	\N	2005970	9369662	00749c64ae6c_000_0000000187_0000766828	912	Session-Timeout	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d89e612476f3
+charchel	1752112418	Start	\N	\N	\N	00749c64ae6c_000_0000000191_0000856390	\N	\N	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
+charchel	1752112443	Stop	\N	0	0	00749c64ae6c_000_0000000191_0000856390	24	User-Request	\N	1	0.0.0.0	\N	\N	\N	\N	00749c64ae6c:Radiator_test	d2441874fac9
 \.
 
 
 --
--- Data for Name: hotspot_accounting_test; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: accounting_test; Type: TABLE DATA; Schema: public; Owner: radiator
 --
 
-COPY public.hotspot_accounting_test (session_id, user_name, calling_station_id, nas_ip_address, nas_port, acct_session_id, start_time, stop_time, input_octets, output_octets, session_time, acct_status_type, service_name) FROM stdin;
-alice-00:11:22:33:44:55	alice	00:11:22:33:44:55	192.168.1.1	1812	sess123	2025-05-27 01:47:58.794705	2025-05-27 01:48:58.949764	12345678	98765432	00:01:00.155059	Stop	premium
+COPY public.accounting_test (calling_station_id, acctdelaytime, acctinputoctets, acctoutputoctets, acctsessionid, acctsessiontime, acctstatustype, acctterminatecause, auth_mode, called_station_id, created_at, device, framedipaddress, mac, nasidentifier, nasport, time_stamp, username) FROM stdin;
 \.
 
 
 --
--- Data for Name: hotspot_test_services; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: allowed_nas_mac_address; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.hotspot_test_services (name, price, prepaidtime, prepaidquota, replyitems, prepaiduprate, prepaiddownrate) FROM stdin;
-free	0	00:10:00	10485760	OSC-AVPAIR=Test1,OSC-AVPAIR=Test2	\N	\N
-premium	1000	00:15:00	20971520	\N	10M	10M
-gold	2000	00:20:00	31457280	\N	15M	15M
+COPY public.allowed_nas_mac_address (id, called_station_id, updated_at) FROM stdin;
+1	00749c64ae6c:Radiator_test	2025-07-08 07:05:59.680395
 \.
 
 
 --
--- Data for Name: hotspot_test_subcribers; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: called_station_log; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.hotspot_test_subcribers (username, password) FROM stdin;
-test	test123
+COPY public.called_station_log (id, username, called_station_id, nas_ip, "timestamp") FROM stdin;
+\.
+
+
+--
+-- Data for Name: namespace_cpu_quota_daily; Type: TABLE DATA; Schema: public; Owner: radiator
+--
+
+COPY public.namespace_cpu_quota_daily (id, namespace, cpu_limit, collected_at) FROM stdin;
+1	cpu-2	1	2025-07-02
+2	cpu-1	2	2025-07-02
+3	namespace1	2	2025-07-09
+4	namespace2	1	2025-07-09
+\.
+
+
+--
+-- Data for Name: namespace_memory_quota_daily; Type: TABLE DATA; Schema: public; Owner: radiator
+--
+
+COPY public.namespace_memory_quota_daily (id, namespace, memory_limit, collected_at) FROM stdin;
+1	namespace1	2147483648	2025-07-03
+2	namespace-1	1073741824	2025-07-03
+3	namespace2	1073741824	2025-07-03
+4	namespace1	2147483648	2025-07-09
+5	namespace2	1073741824	2025-07-09
+\.
+
+
+--
+-- Data for Name: nas_session_mac_attrs; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.nas_session_mac_attrs (username, called_station_id, updated_at) FROM stdin;
+newuser	00749c64ae6c:Radiator_test	2025-07-10 00:56:59.244329
+charchel	00749c64ae6c:Radiator_test	2025-07-10 01:54:03.172441
+\.
+
+
+--
+-- Data for Name: pod_resource_usage_limits; Type: TABLE DATA; Schema: public; Owner: radiator
+--
+
+COPY public.pod_resource_usage_limits (id, namespace, pod, resource, value, collected_at) FROM stdin;
+1	rabbitmq-system	rabbitmq-operator-rabbitmq-cluster-operator-5f7469766f-brpp8	memory	201326592	2025-07-08
+2	rabbitmq-system	rabbitmq-operator-rabbitmq-cluster-operator-5f7469766f-brpp8	cpu	0.149999999999999994	2025-07-08
+16	rabbitmq-system	rabbitmq-operator-rabbitmq-messaging-topology-operator-759zz2sz	memory	201326592	2025-07-08
+17	rabbitmq-system	rabbitmq-operator-rabbitmq-messaging-topology-operator-759zz2sz	cpu	0.149999999999999994	2025-07-08
+18	openobserve	o2-openobserve-openfga-6fb5cc9c55-7b2p4	cpu	0.200000000000000011	2025-07-08
+19	openobserve	o2-openobserve-openfga-6fb5cc9c55-7b2p4	memory	209715200	2025-07-08
+23	namespace1	redis-1-554bd996d9-dvdgw	cpu	1	2025-07-08
+24	namespace1	redis-1-554bd996d9-dvdgw	memory	1000341504	2025-07-08
+1065	cnpg-system	cnpg-controller-manager-d9565bf97-tfnr5	cpu	0.100000000000000006	2025-07-09
+1066	cnpg-system	cnpg-controller-manager-d9565bf97-tfnr5	memory	209715200	2025-07-09
+1067	openobserve	o2-openobserve-actions-1	cpu	1	2025-07-09
+1068	openobserve	o2-openobserve-actions-1	memory	1073741824	2025-07-09
+1069	onlyoffice	rabbitmq-server-0	cpu	2	2025-07-09
+1070	onlyoffice	rabbitmq-server-0	memory	2147483648	2025-07-09
+1071	rabbitmq-system	rabbitmq-operator-rabbitmq-messaging-topology-operator-759pnz2t	memory	201326592	2025-07-09
+1072	rabbitmq-system	rabbitmq-operator-rabbitmq-messaging-topology-operator-759pnz2t	cpu	0.149999999999999994	2025-07-09
+1073	openobserve	o2-openobserve-actions-0	cpu	1	2025-07-09
+1074	openobserve	o2-openobserve-actions-0	memory	1073741824	2025-07-09
+1075	onlyoffice	rabbitmq-server-2	cpu	2	2025-07-09
+1076	onlyoffice	rabbitmq-server-2	memory	2147483648	2025-07-09
+1077	rabbitmq-system	rabbitmq-operator-rabbitmq-cluster-operator-5f7469766f-8hswq	cpu	0.149999999999999994	2025-07-09
+1078	rabbitmq-system	rabbitmq-operator-rabbitmq-cluster-operator-5f7469766f-8hswq	memory	201326592	2025-07-09
+1079	kube-system	coredns-578d4f8ffc-wdrn7	memory	178257920	2025-07-09
+1080	kubelet-serving-cert-approver	kubelet-serving-cert-approver-f6995d4dc-pgmdl	cpu	0.25	2025-07-09
+1081	kubelet-serving-cert-approver	kubelet-serving-cert-approver-f6995d4dc-pgmdl	memory	33554432	2025-07-09
+1082	kube-system	coredns-578d4f8ffc-6wcnb	memory	178257920	2025-07-09
+1083	openobserve	o2-openobserve-openfga-6fb5cc9c55-r54s4	cpu	0.200000000000000011	2025-07-09
+1084	openobserve	o2-openobserve-openfga-6fb5cc9c55-r54s4	memory	209715200	2025-07-09
+1085	namespace1	redis-1-554bd996d9-l6brf	cpu	1	2025-07-09
+1086	namespace1	redis-1-554bd996d9-l6brf	memory	1000341504	2025-07-09
+1087	onlyoffice	rabbitmq-server-1	cpu	2	2025-07-09
+1088	onlyoffice	rabbitmq-server-1	memory	2147483648	2025-07-09
+49	openobserve	o2-openobserve-openfga-6fb5cc9c55-m6f9f	cpu	0.200000000000000011	2025-07-08
+50	openobserve	o2-openobserve-openfga-6fb5cc9c55-m6f9f	memory	209715200	2025-07-08
+22	openobserve	o2-openobserve-actions-0	cpu	1	2025-07-08
+21	openobserve	o2-openobserve-actions-0	memory	1073741824	2025-07-08
+7	onlyoffice	rabbitmq-server-0	cpu	2	2025-07-08
+6	onlyoffice	rabbitmq-server-0	memory	2147483648	2025-07-08
+5	onlyoffice	rabbitmq-server-2	memory	2147483648	2025-07-08
+4	onlyoffice	rabbitmq-server-2	cpu	2	2025-07-08
+3	kube-system	coredns-578d4f8ffc-wdrn7	memory	178257920	2025-07-08
+8	kubelet-serving-cert-approver	kubelet-serving-cert-approver-f6995d4dc-pgmdl	cpu	0.25	2025-07-08
+9	kubelet-serving-cert-approver	kubelet-serving-cert-approver-f6995d4dc-pgmdl	memory	33554432	2025-07-08
+60	rabbitmq-system	rabbitmq-operator-rabbitmq-cluster-operator-5f7469766f-h7gj2	cpu	0.149999999999999994	2025-07-08
+61	rabbitmq-system	rabbitmq-operator-rabbitmq-cluster-operator-5f7469766f-h7gj2	memory	201326592	2025-07-08
+12	openobserve	o2-openobserve-actions-1	cpu	1	2025-07-08
+13	openobserve	o2-openobserve-actions-1	memory	1073741824	2025-07-08
+64	rabbitmq-system	rabbitmq-operator-rabbitmq-messaging-topology-operator-759q86g8	cpu	0.149999999999999994	2025-07-08
+65	rabbitmq-system	rabbitmq-operator-rabbitmq-messaging-topology-operator-759q86g8	memory	201326592	2025-07-08
+66	namespace1	redis-1-554bd996d9-6lz2m	memory	1000341504	2025-07-08
+67	namespace1	redis-1-554bd996d9-6lz2m	cpu	1	2025-07-08
+20	kube-system	coredns-578d4f8ffc-6wcnb	memory	178257920	2025-07-08
+14	cnpg-system	cnpg-controller-manager-d9565bf97-p6zzm	cpu	0.100000000000000006	2025-07-08
+15	cnpg-system	cnpg-controller-manager-d9565bf97-p6zzm	memory	209715200	2025-07-08
+10	onlyoffice	rabbitmq-server-1	cpu	2	2025-07-08
+11	onlyoffice	rabbitmq-server-1	memory	2147483648	2025-07-08
+\.
+
+
+--
+-- Data for Name: pod_resource_usage_requests; Type: TABLE DATA; Schema: public; Owner: radiator
+--
+
+COPY public.pod_resource_usage_requests (id, namespace, pod, resource, value, collected_at) FROM stdin;
+4	rabbitmq-system	rabbitmq-operator-rabbitmq-cluster-operator-5f7469766f-brpp8	cpu	0.100000000000000006	2025-07-08
+5	rabbitmq-system	rabbitmq-operator-rabbitmq-cluster-operator-5f7469766f-brpp8	memory	134217728	2025-07-08
+11	ingress-nginx	ingress-nginx-controller-7657f6db5f-4b27r	cpu	0.100000000000000006	2025-07-08
+12	ingress-nginx	ingress-nginx-controller-7657f6db5f-4b27r	memory	94371840	2025-07-08
+20	ingress-nginx	ingress-nginx-controller-7657f6db5f-zzhmc	cpu	0.100000000000000006	2025-07-08
+21	ingress-nginx	ingress-nginx-controller-7657f6db5f-zzhmc	memory	94371840	2025-07-08
+39	rabbitmq-system	rabbitmq-operator-rabbitmq-messaging-topology-operator-759zz2sz	cpu	0.100000000000000006	2025-07-08
+40	rabbitmq-system	rabbitmq-operator-rabbitmq-messaging-topology-operator-759zz2sz	memory	134217728	2025-07-08
+44	openobserve	o2-openobserve-openfga-6fb5cc9c55-7b2p4	cpu	0.200000000000000011	2025-07-08
+45	openobserve	o2-openobserve-openfga-6fb5cc9c55-7b2p4	memory	209715200	2025-07-08
+46	ingress-nginx	ingress-nginx-controller-7657f6db5f-cfdt7	cpu	0.100000000000000006	2025-07-08
+47	ingress-nginx	ingress-nginx-controller-7657f6db5f-cfdt7	memory	94371840	2025-07-08
+56	namespace1	redis-1-554bd996d9-dvdgw	cpu	0.5	2025-07-08
+57	namespace1	redis-1-554bd996d9-dvdgw	memory	500170752	2025-07-08
+2110	kube-system	kube-apiserver-controlplane-1	memory	536870912	2025-07-09
+2111	kube-system	kube-apiserver-controlplane-1	cpu	0.200000000000000011	2025-07-09
+2112	cnpg-system	cnpg-controller-manager-d9565bf97-tfnr5	memory	104857600	2025-07-09
+2113	cnpg-system	cnpg-controller-manager-d9565bf97-tfnr5	cpu	0.100000000000000006	2025-07-09
+2114	openobserve	o2-openobserve-actions-1	cpu	0.100000000000000006	2025-07-09
+2115	openobserve	o2-openobserve-actions-1	memory	134217728	2025-07-09
+2116	onlyoffice	rabbitmq-server-0	cpu	1	2025-07-09
+2117	onlyoffice	rabbitmq-server-0	memory	2147483648	2025-07-09
+2118	rabbitmq-system	rabbitmq-operator-rabbitmq-messaging-topology-operator-759pnz2t	cpu	0.100000000000000006	2025-07-09
+2119	rabbitmq-system	rabbitmq-operator-rabbitmq-messaging-topology-operator-759pnz2t	memory	134217728	2025-07-09
+2120	longhorn-system	instance-manager-4c50527fc2bde8329ed0ab82c2b062da	cpu	6.71400000000000041	2025-07-09
+2121	kube-system	kube-scheduler-controlplane-1	cpu	0.0100000000000000002	2025-07-09
+2122	kube-system	kube-scheduler-controlplane-1	memory	67108864	2025-07-09
+2123	openobserve	o2-minio-0	memory	268435456	2025-07-09
+2124	kube-system	metrics-server-54bf7cdd6-b4ht9	cpu	0.100000000000000006	2025-07-09
+2125	kube-system	metrics-server-54bf7cdd6-b4ht9	memory	209715200	2025-07-09
+2126	openobserve	o2-openobserve-actions-0	memory	134217728	2025-07-09
+2127	openobserve	o2-openobserve-actions-0	cpu	0.100000000000000006	2025-07-09
+2128	onlyoffice	rabbitmq-server-2	cpu	1	2025-07-09
+2129	onlyoffice	rabbitmq-server-2	memory	2147483648	2025-07-09
+2130	rabbitmq-system	rabbitmq-operator-rabbitmq-cluster-operator-5f7469766f-8hswq	cpu	0.100000000000000006	2025-07-09
+2131	rabbitmq-system	rabbitmq-operator-rabbitmq-cluster-operator-5f7469766f-8hswq	memory	134217728	2025-07-09
+2132	kube-system	coredns-578d4f8ffc-wdrn7	cpu	0.100000000000000006	2025-07-09
+2133	kube-system	coredns-578d4f8ffc-wdrn7	memory	73400320	2025-07-09
+2134	kube-system	kube-apiserver-controlplane-2	cpu	0.200000000000000011	2025-07-09
+2135	kube-system	kube-apiserver-controlplane-2	memory	536870912	2025-07-09
+2136	kubelet-serving-cert-approver	kubelet-serving-cert-approver-f6995d4dc-pgmdl	memory	16777216	2025-07-09
+2137	kubelet-serving-cert-approver	kubelet-serving-cert-approver-f6995d4dc-pgmdl	cpu	0.0100000000000000002	2025-07-09
+2138	kube-system	kube-scheduler-controlplane-2	cpu	0.0100000000000000002	2025-07-09
+2139	kube-system	kube-scheduler-controlplane-2	memory	67108864	2025-07-09
+2140	ingress-nginx	ingress-nginx-controller-7657f6db5f-x4dtl	cpu	0.100000000000000006	2025-07-09
+2141	ingress-nginx	ingress-nginx-controller-7657f6db5f-x4dtl	memory	94371840	2025-07-09
+2142	ingress-nginx	ingress-nginx-controller-7657f6db5f-9r25n	cpu	0.100000000000000006	2025-07-09
+2143	ingress-nginx	ingress-nginx-controller-7657f6db5f-9r25n	memory	94371840	2025-07-09
+2144	ingress-nginx	ingress-nginx-controller-7657f6db5f-mqh82	memory	94371840	2025-07-09
+2145	ingress-nginx	ingress-nginx-controller-7657f6db5f-mqh82	cpu	0.100000000000000006	2025-07-09
+2146	kube-system	kube-scheduler-controlplane-3	cpu	0.0100000000000000002	2025-07-09
+2147	kube-system	kube-scheduler-controlplane-3	memory	67108864	2025-07-09
+2148	kube-system	coredns-578d4f8ffc-6wcnb	cpu	0.100000000000000006	2025-07-09
+2149	kube-system	coredns-578d4f8ffc-6wcnb	memory	73400320	2025-07-09
+2150	kube-system	kube-apiserver-controlplane-3	cpu	0.200000000000000011	2025-07-09
+2151	kube-system	kube-apiserver-controlplane-3	memory	536870912	2025-07-09
+2152	kube-system	kube-controller-manager-controlplane-1	cpu	0.0500000000000000028	2025-07-09
+2153	kube-system	kube-controller-manager-controlplane-1	memory	268435456	2025-07-09
+2154	openobserve	o2-openobserve-openfga-6fb5cc9c55-r54s4	memory	209715200	2025-07-09
+2155	openobserve	o2-openobserve-openfga-6fb5cc9c55-r54s4	cpu	0.200000000000000011	2025-07-09
+2156	longhorn-system	instance-manager-777dd5fd3ee819f26951357fbc1b7877	cpu	6.71400000000000041	2025-07-09
+2157	monitoring	alertmanager-kps1-kube-prometheus-stack-alertmanager-0	memory	209715200	2025-07-09
+2158	namespace1	redis-1-554bd996d9-l6brf	cpu	0.5	2025-07-09
+2159	namespace1	redis-1-554bd996d9-l6brf	memory	500170752	2025-07-09
+2160	onlyoffice	rabbitmq-server-1	cpu	1	2025-07-09
+2161	onlyoffice	rabbitmq-server-1	memory	2147483648	2025-07-09
+2162	kube-system	kube-controller-manager-controlplane-3	cpu	0.0500000000000000028	2025-07-09
+2163	kube-system	kube-controller-manager-controlplane-3	memory	268435456	2025-07-09
+2164	kube-system	kube-controller-manager-controlplane-2	cpu	0.0500000000000000028	2025-07-09
+2165	kube-system	kube-controller-manager-controlplane-2	memory	268435456	2025-07-09
+2166	openobserve	o2-minio-1	memory	268435456	2025-07-09
+258	rabbitmq-system	rabbitmq-operator-rabbitmq-cluster-operator-5f7469766f-h7gj2	cpu	0.100000000000000006	2025-07-08
+29	kube-system	kube-controller-manager-controlplane-1	memory	268435456	2025-07-08
+233	ingress-nginx	ingress-nginx-controller-7657f6db5f-tpqgg	cpu	0.100000000000000006	2025-07-08
+234	ingress-nginx	ingress-nginx-controller-7657f6db5f-tpqgg	memory	94371840	2025-07-08
+235	ingress-nginx	ingress-nginx-controller-7657f6db5f-2nzzj	cpu	0.100000000000000006	2025-07-08
+236	ingress-nginx	ingress-nginx-controller-7657f6db5f-2nzzj	memory	94371840	2025-07-08
+237	openobserve	o2-openobserve-openfga-6fb5cc9c55-m6f9f	cpu	0.200000000000000011	2025-07-08
+238	openobserve	o2-openobserve-openfga-6fb5cc9c55-m6f9f	memory	209715200	2025-07-08
+55	openobserve	o2-openobserve-actions-0	cpu	0.100000000000000006	2025-07-08
+54	openobserve	o2-openobserve-actions-0	memory	134217728	2025-07-08
+22	onlyoffice	rabbitmq-server-0	cpu	1	2025-07-08
+23	onlyoffice	rabbitmq-server-0	memory	2147483648	2025-07-08
+8	onlyoffice	rabbitmq-server-2	cpu	1	2025-07-08
+9	onlyoffice	rabbitmq-server-2	memory	2147483648	2025-07-08
+33	kube-system	kube-apiserver-controlplane-2	cpu	0.200000000000000011	2025-07-08
+34	kube-system	kube-apiserver-controlplane-2	memory	536870912	2025-07-08
+18	kube-system	kube-scheduler-controlplane-3	cpu	0.0100000000000000002	2025-07-08
+19	kube-system	kube-scheduler-controlplane-3	memory	67108864	2025-07-08
+52	kube-system	kube-controller-manager-controlplane-3	cpu	0.0500000000000000028	2025-07-08
+53	kube-system	kube-controller-manager-controlplane-3	memory	268435456	2025-07-08
+6	kube-system	coredns-578d4f8ffc-wdrn7	cpu	0.100000000000000006	2025-07-08
+7	kube-system	coredns-578d4f8ffc-wdrn7	memory	73400320	2025-07-08
+26	kubelet-serving-cert-approver	kubelet-serving-cert-approver-f6995d4dc-pgmdl	cpu	0.0100000000000000002	2025-07-08
+27	kubelet-serving-cert-approver	kubelet-serving-cert-approver-f6995d4dc-pgmdl	memory	16777216	2025-07-08
+255	ingress-nginx	ingress-nginx-controller-7657f6db5f-v54cb	cpu	0.100000000000000006	2025-07-08
+256	ingress-nginx	ingress-nginx-controller-7657f6db5f-v54cb	memory	94371840	2025-07-08
+43	monitoring	alertmanager-kps1-kube-prometheus-stack-alertmanager-0	memory	209715200	2025-07-08
+48	kube-system	kube-scheduler-controlplane-2	cpu	0.0100000000000000002	2025-07-08
+28	kube-system	kube-controller-manager-controlplane-1	cpu	0.0500000000000000028	2025-07-08
+259	rabbitmq-system	rabbitmq-operator-rabbitmq-cluster-operator-5f7469766f-h7gj2	memory	134217728	2025-07-08
+13	longhorn-system	instance-manager-4c50527fc2bde8329ed0ab82c2b062da	cpu	6.71400000000000041	2025-07-08
+35	openobserve	o2-openobserve-actions-1	cpu	0.100000000000000006	2025-07-08
+36	openobserve	o2-openobserve-actions-1	memory	134217728	2025-07-08
+25	kube-system	kube-apiserver-controlplane-3	memory	536870912	2025-07-08
+24	kube-system	kube-apiserver-controlplane-3	cpu	0.200000000000000011	2025-07-08
+41	kube-system	kube-scheduler-controlplane-1	cpu	0.0100000000000000002	2025-07-08
+42	kube-system	kube-scheduler-controlplane-1	memory	67108864	2025-07-08
+3	longhorn-system	instance-manager-777dd5fd3ee819f26951357fbc1b7877	cpu	6.71400000000000041	2025-07-08
+268	rabbitmq-system	rabbitmq-operator-rabbitmq-messaging-topology-operator-759q86g8	cpu	0.100000000000000006	2025-07-08
+269	rabbitmq-system	rabbitmq-operator-rabbitmq-messaging-topology-operator-759q86g8	memory	134217728	2025-07-08
+270	namespace1	redis-1-554bd996d9-6lz2m	cpu	0.5	2025-07-08
+271	namespace1	redis-1-554bd996d9-6lz2m	memory	500170752	2025-07-08
+51	kube-system	coredns-578d4f8ffc-6wcnb	cpu	0.100000000000000006	2025-07-08
+50	kube-system	coredns-578d4f8ffc-6wcnb	memory	73400320	2025-07-08
+17	kube-system	kube-apiserver-controlplane-1	memory	536870912	2025-07-08
+16	kube-system	kube-apiserver-controlplane-1	cpu	0.200000000000000011	2025-07-08
+37	cnpg-system	cnpg-controller-manager-d9565bf97-p6zzm	cpu	0.100000000000000006	2025-07-08
+38	cnpg-system	cnpg-controller-manager-d9565bf97-p6zzm	memory	104857600	2025-07-08
+15	kube-system	kube-controller-manager-controlplane-2	cpu	0.0500000000000000028	2025-07-08
+14	kube-system	kube-controller-manager-controlplane-2	memory	268435456	2025-07-08
+30	onlyoffice	rabbitmq-server-1	cpu	1	2025-07-08
+31	onlyoffice	rabbitmq-server-1	memory	2147483648	2025-07-08
+10	openobserve	o2-minio-0	memory	268435456	2025-07-08
+32	openobserve	o2-minio-1	memory	268435456	2025-07-08
+1	kube-system	metrics-server-54bf7cdd6-mvtrj	cpu	0.100000000000000006	2025-07-08
+2	kube-system	metrics-server-54bf7cdd6-mvtrj	memory	209715200	2025-07-08
+49	kube-system	kube-scheduler-controlplane-2	memory	67108864	2025-07-08
+\.
+
+
+--
+-- Data for Name: pvc_storage_requests; Type: TABLE DATA; Schema: public; Owner: radiator
+--
+
+COPY public.pvc_storage_requests (id, namespace, persistentvolumeclaim, value, collected_at) FROM stdin;
+1	freeipa	freeipa	5368709120	2025-07-03 03:01:46.52+00
+2	infra	acs-target-pvc	5368709120	2025-07-03 03:01:46.52+00
+3	openobserve	o2-nats-js-o2-nats-0	32212254720	2025-07-03 03:01:46.52+00
+4	infra	acs-logs-pvc	21474836480	2025-07-03 03:01:46.52+00
+5	openobserve	o2-nats-js-o2-nats-2	32212254720	2025-07-03 03:01:46.52+00
+6	openobserve	cache-o2-openobserve-querier-1	53687091200	2025-07-03 03:01:46.52+00
+7	openobserve	cache-o2-openobserve-alertmanager-0	21474836480	2025-07-03 03:01:46.52+00
+8	openobserve	data-o2-openobserve-ingester-0	53687091200	2025-07-03 03:01:46.52+00
+9	openobserve	o2-openobserve-postgres-1	53687091200	2025-07-03 03:01:46.52+00
+10	infra	acs-src-pvc	5368709120	2025-07-03 03:01:46.52+00
+11	openobserve	o2-nats-js-o2-nats-1	32212254720	2025-07-03 03:01:46.52+00
+12	openobserve	export-o2-minio-1	53687091200	2025-07-03 03:01:46.52+00
+13	openobserve	cache-o2-openobserve-alertmanager-1	21474836480	2025-07-03 03:01:46.52+00
+14	openobserve	cache-o2-openobserve-querier-0	53687091200	2025-07-03 03:01:46.52+00
+15	openobserve	export-o2-minio-0	53687091200	2025-07-03 03:01:46.52+00
+16	openobserve	data-o2-openobserve-ingester-1	53687091200	2025-07-03 03:01:46.52+00
+17	nextcloud	nextcloud-pvc	10737418240	2025-07-03 03:01:46.52+00
+18	default	task-pv-claim	3221225472	2025-07-03 03:01:46.52+00
+19	openobserve	o2-openobserve-postgres-2	53687091200	2025-07-03 03:01:46.52+00
+1771	freeipa	freeip	5368709120	2025-07-03 03:01:46.52+00
+6553	openobserve	export-o2-minio-0	53687091200	2025-07-09 04:00:08.794+00
+6554	single-nextcloud	nextcloud-pvc	3221225472	2025-07-09 04:00:08.794+00
+6555	onlyoffice	ds-files	8589934592	2025-07-09 04:00:08.794+00
+6556	multiple-nextcloud	nextcloud-pvc	5368709120	2025-07-09 04:00:08.794+00
+6557	openobserve	o2-nats-js-o2-nats-1	32212254720	2025-07-09 04:00:08.794+00
+6558	onlyoffice	persistence-rabbitmq-server-0	3221225472	2025-07-09 04:00:08.794+00
+6559	openobserve	cache-o2-openobserve-querier-1	53687091200	2025-07-09 04:00:08.794+00
+6560	openobserve	cache-o2-openobserve-alertmanager-0	21474836480	2025-07-09 04:00:08.794+00
+6561	openobserve	export-o2-minio-1	53687091200	2025-07-09 04:00:08.794+00
+6562	single-nextcloud	db-pvc	3221225472	2025-07-09 04:00:08.794+00
+6563	namespace1	test	5368709120	2025-07-09 04:00:08.794+00
+6564	default	task-pv-claim	3221225472	2025-07-09 04:00:08.794+00
+6565	openobserve	o2-openobserve-postgres-1	53687091200	2025-07-09 04:00:08.794+00
+6566	multiple-nextcloud	postgresql-node-2	5368709120	2025-07-09 04:00:08.794+00
+6567	multiple-nextcloud	postgresql-node-1	5368709120	2025-07-09 04:00:08.794+00
+6568	onlyoffice	postgresql-node-3	3221225472	2025-07-09 04:00:08.794+00
+6569	onlyoffice	persistence-rabbitmq-server-2	3221225472	2025-07-09 04:00:08.794+00
+6570	openobserve	o2-nats-js-o2-nats-0	32212254720	2025-07-09 04:00:08.794+00
+6571	onlyoffice	ds-runtime-config	1073741824	2025-07-09 04:00:08.794+00
+6572	openobserve	o2-openobserve-postgres-2	53687091200	2025-07-09 04:00:08.794+00
+6573	onlyoffice	postgresql-node-1	3221225472	2025-07-09 04:00:08.794+00
+6574	infra	acs-src-pvc	5368709120	2025-07-09 04:00:08.794+00
+6575	openobserve	cache-o2-openobserve-querier-0	53687091200	2025-07-09 04:00:08.794+00
+6576	openobserve	data-o2-openobserve-ingester-1	53687091200	2025-07-09 04:00:08.794+00
+6577	test-ipa	freeipa-data-pvc	1073741824	2025-07-09 04:00:08.794+00
+6578	openobserve	o2-nats-js-o2-nats-2	32212254720	2025-07-09 04:00:08.794+00
+6579	infra	acs-target-pvc	5368709120	2025-07-09 04:00:08.794+00
+6580	onlyoffice	persistence-rabbitmq-server-1	3221225472	2025-07-09 04:00:08.794+00
+6581	onlyoffice	postgresql-node-2	3221225472	2025-07-09 04:00:08.794+00
+6582	openobserve	data-o2-openobserve-ingester-0	53687091200	2025-07-09 04:00:08.794+00
+6583	infra	acs-logs-pvc	21474836480	2025-07-09 04:00:08.794+00
+6584	multiple-nextcloud	postgresql-node-3	5368709120	2025-07-09 04:00:08.794+00
+6585	openobserve	cache-o2-openobserve-alertmanager-1	21474836480	2025-07-09 04:00:08.794+00
 \.
 
 
@@ -72125,6 +74972,19 @@ COPY public.radauthlog (time_stamp, username, type, reason) FROM stdin;
 1747115227	testuser	0	None of the desired EAP types (25) are available
 1747127682	testuser	1	\N
 1747202468	testuser	1	\N
+1748590788	testlimit	0	None of the desired EAP types (25) are available
+1748590801	testlimit	0	None of the desired EAP types (25) are available
+1748590808	testlimit	0	None of the desired EAP types (25) are available
+1748590936	testlimit	0	None of the desired EAP types (25) are available
+1748590949	testlimit	0	None of the desired EAP types (25) are available
+1748590959	testlimit	0	None of the desired EAP types (25) are available
+1748591035	testlimit	0	None of the desired EAP types (25) are available
+1748591045	testlimit	0	None of the desired EAP types (25) are available
+1748591057	testlimit	0	None of the desired EAP types (25) are available
+1748591079	testlimit	0	None of the desired EAP types (25) are available
+1748591089	testlimit	0	None of the desired EAP types (25) are available
+1748591098	testlimit	0	None of the desired EAP types (25) are available
+1748591108	testlimit	0	None of the desired EAP types (25) are available
 \.
 
 
@@ -72140,13 +75000,14 @@ COPY public.radcheck_old (id, username, attribute, op, value, full_name, address
 -- Data for Name: radclientlist; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.radclientlist (nasidentifier, secret, ignoreacctsignature, dupinterval, defaultrealm, nastype, snmpcommunity, livingstonoffs, livingstonhole, framedgroupbaseaddress, framedgroupmaxportsperclassc, rewriteusername, noignoreduplicates, prehandlerhook) FROM stdin;
-12.0.0.1	ap0ll0	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-172.31.239.66	ap0ll0	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-172.31.239.68	ap0ll0	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-127.0.0.1	ap0ll0	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-202.60.9.29	ap0ll0	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-103.123.147.29	ap0ll0	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+COPY public.radclientlist (nasidentifier, secret, ignoreacctsignature, dupinterval, defaultrealm, nastype, snmpcommunity, livingstonoffs, livingstonhole, framedgroupbaseaddress, framedgroupmaxportsperclassc, rewriteusername, noignoreduplicates, prehandlerhook, identifier) FROM stdin;
+12.0.0.1	ap0ll0	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+172.31.239.66	ap0ll0	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+172.31.239.68	ap0ll0	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+127.0.0.1	ap0ll0	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+202.60.9.29	ap0ll0	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+103.123.147.29	ap0ll0	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+202.60.11.212	ap0ll0	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	00749c64ae6c
 \.
 
 
@@ -72199,14 +75060,80 @@ COPY public.radstatslog (time_stamp, type, identifier, accessaccepts, accesschal
 
 
 --
+-- Data for Name: sessions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.sessions (username, nasipaddress, nasport, acctsessionid, acctstarttime) FROM stdin;
+\.
+
+
+--
 -- Data for Name: subscribers; Type: TABLE DATA; Schema: public; Owner: radiator
 --
 
 COPY public.subscribers (id, username, password, session_limit, remaining_session_time, bytes_limit, remaining_bytes, lname, fname, mname, ename, address, phone_no, birthdate, gender, status, registration_date) FROM stdin;
+3762	testuser10	testpass10	0	\N	\N	\N	default	default	\N	\N	unknown	0000000000	2025-06-09	N/A	0	2025-06-09
+3763	testuser11	testpass11	0	\N	\N	\N	default	default	\N	\N	unknown	0000000000	2025-06-09	N/A	0	2025-06-09
+3760	newuser	newpass123	28800	28800	10485760	10485760	Lastname	Firstname	M	\N	456 New St, City	09170001111	1999-12-31	Male	1	2025-06-04
+3759	apollo-cdo	ap0ll0	0	\N	\N	\N	default	default	\N	\N	unknown	0000000000	2025-06-02	N/A	0	2025-06-02
+3751	mca	mcapass	120	120	10000000	10000000	limit2	test	\N	\N	123 Street Juan	09171234568	2025-05-01	Male	1	2025-05-01
+3800	charchel	charchelpass	28800	28800	10485760	10485760	charchel	char			456 Avenue Maria	09179876543	2025-06-27	Female	1	2025-06-27
+3752	jdoe	securepassword123	5	5	5000000000	5000000000	Doe	John	M		123 Main Street	09171234567	1995-08-15	M	1	2025-05-30
+3754	john_doe	securepassword123	5	5	104857600	104857600	Doe	John	A		123 Main St, Springfield	1234567890	1990-01-01	Male	1	2024-06-01
+3761	dave	dave123	300	300	10000000000	10000000000	Lastname	Firstname	M	\N	456 New St, City	09170001111	1999-12-31	Male	1	2025-06-04
+3758	testuser	testpass	120	120	120	120	default	default	\N	\N	unknown	0000000000	2025-06-02	N/A	1	2025-06-02
+3747	testlimit	limitpass	120	120	10000000	10000000	testlimit	test	\N	\N	123 Street Juan, Cdo	09171234569	2000-01-01	Male	0	2025-05-03
 3746	limit	test	120	120	10000000	10000000	limit	test	\N	\N	123 Street Juan, Cdo	09171234568	2000-01-01	Male	1	2025-05-02
-3747	testlimit	limitpass	120	120	10000000	10000000	testlimit	test	\N	\N	123 Street Juan, Cdo	09171234569	2000-01-01	Male	1	2025-05-03
-3745	testuser	testpass	120	120	10000000	4931994	test	user	\N	\N	123 Street Juan, Cdo	09171234567	2000-01-01	Male	1	2025-05-01
 \.
+
+
+--
+-- Name: allowed_nas_mac_address_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.allowed_nas_mac_address_id_seq', 1, true);
+
+
+--
+-- Name: called_station_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.called_station_log_id_seq', 1, false);
+
+
+--
+-- Name: namespace_cpu_quota_daily_id_seq; Type: SEQUENCE SET; Schema: public; Owner: radiator
+--
+
+SELECT pg_catalog.setval('public.namespace_cpu_quota_daily_id_seq', 4, true);
+
+
+--
+-- Name: namespace_memory_quota_daily_id_seq; Type: SEQUENCE SET; Schema: public; Owner: radiator
+--
+
+SELECT pg_catalog.setval('public.namespace_memory_quota_daily_id_seq', 5, true);
+
+
+--
+-- Name: pod_resource_usage_limits_id_seq; Type: SEQUENCE SET; Schema: public; Owner: radiator
+--
+
+SELECT pg_catalog.setval('public.pod_resource_usage_limits_id_seq', 1424, true);
+
+
+--
+-- Name: pod_resource_usage_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: radiator
+--
+
+SELECT pg_catalog.setval('public.pod_resource_usage_requests_id_seq', 2736, true);
+
+
+--
+-- Name: pvc_storage_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: radiator
+--
+
+SELECT pg_catalog.setval('public.pvc_storage_requests_id_seq', 10202, true);
 
 
 --
@@ -72227,31 +75154,127 @@ SELECT pg_catalog.setval('public.radcheck_old_id_seq', 1, false);
 -- Name: subscribers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.subscribers_id_seq', 3748, true);
+SELECT pg_catalog.setval('public.subscribers_id_seq', 3763, true);
 
 
 --
--- Name: hotspot_accounting_test hotspot_accounting_test_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: accounting_test accounting_test_pkey; Type: CONSTRAINT; Schema: public; Owner: radiator
 --
 
-ALTER TABLE ONLY public.hotspot_accounting_test
-    ADD CONSTRAINT hotspot_accounting_test_pkey PRIMARY KEY (session_id);
-
-
---
--- Name: hotspot_test_services hotspot_test_services_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.hotspot_test_services
-    ADD CONSTRAINT hotspot_test_services_pkey PRIMARY KEY (name);
+ALTER TABLE ONLY public.accounting_test
+    ADD CONSTRAINT accounting_test_pkey PRIMARY KEY (calling_station_id);
 
 
 --
--- Name: hotspot_test_subcribers hotspot_test_subcribers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: allowed_nas_mac_address allowed_nas_mac_address_called_station_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.hotspot_test_subcribers
-    ADD CONSTRAINT hotspot_test_subcribers_pkey PRIMARY KEY (username);
+ALTER TABLE ONLY public.allowed_nas_mac_address
+    ADD CONSTRAINT allowed_nas_mac_address_called_station_id_key UNIQUE (called_station_id);
+
+
+--
+-- Name: allowed_nas_mac_address allowed_nas_mac_address_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.allowed_nas_mac_address
+    ADD CONSTRAINT allowed_nas_mac_address_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: called_station_log called_station_log_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.called_station_log
+    ADD CONSTRAINT called_station_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: namespace_cpu_quota_daily namespace_cpu_quota_daily_namespace_collected_at_key; Type: CONSTRAINT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.namespace_cpu_quota_daily
+    ADD CONSTRAINT namespace_cpu_quota_daily_namespace_collected_at_key UNIQUE (namespace, collected_at);
+
+
+--
+-- Name: namespace_cpu_quota_daily namespace_cpu_quota_daily_pkey; Type: CONSTRAINT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.namespace_cpu_quota_daily
+    ADD CONSTRAINT namespace_cpu_quota_daily_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: namespace_memory_quota_daily namespace_memory_quota_daily_namespace_collected_at_key; Type: CONSTRAINT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.namespace_memory_quota_daily
+    ADD CONSTRAINT namespace_memory_quota_daily_namespace_collected_at_key UNIQUE (namespace, collected_at);
+
+
+--
+-- Name: namespace_memory_quota_daily namespace_memory_quota_daily_pkey; Type: CONSTRAINT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.namespace_memory_quota_daily
+    ADD CONSTRAINT namespace_memory_quota_daily_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: nas_session_mac_attrs nas_session_mac_attrs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.nas_session_mac_attrs
+    ADD CONSTRAINT nas_session_mac_attrs_pkey PRIMARY KEY (username);
+
+
+--
+-- Name: pod_resource_usage_limits pod_resource_usage_limits_namespace_pod_resource_collected__key; Type: CONSTRAINT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.pod_resource_usage_limits
+    ADD CONSTRAINT pod_resource_usage_limits_namespace_pod_resource_collected__key UNIQUE (namespace, pod, resource, collected_at);
+
+
+--
+-- Name: pod_resource_usage_limits pod_resource_usage_limits_pkey; Type: CONSTRAINT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.pod_resource_usage_limits
+    ADD CONSTRAINT pod_resource_usage_limits_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pod_resource_usage_requests pod_resource_usage_requests_namespace_pod_resource_collecte_key; Type: CONSTRAINT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.pod_resource_usage_requests
+    ADD CONSTRAINT pod_resource_usage_requests_namespace_pod_resource_collecte_key UNIQUE (namespace, pod, resource, collected_at);
+
+
+--
+-- Name: pod_resource_usage_requests pod_resource_usage_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.pod_resource_usage_requests
+    ADD CONSTRAINT pod_resource_usage_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pvc_storage_requests pvc_storage_requests_namespace_persistentvolumeclaim_collec_key; Type: CONSTRAINT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.pvc_storage_requests
+    ADD CONSTRAINT pvc_storage_requests_namespace_persistentvolumeclaim_collec_key UNIQUE (namespace, persistentvolumeclaim, collected_at);
+
+
+--
+-- Name: pvc_storage_requests pvc_storage_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: radiator
+--
+
+ALTER TABLE ONLY public.pvc_storage_requests
+    ADD CONSTRAINT pvc_storage_requests_pkey PRIMARY KEY (id);
 
 
 --
@@ -72364,6 +75387,14 @@ CREATE UNIQUE INDEX radsqlradiusindirect_i1 ON public.radsqlradiusindirect USING
 
 
 --
+-- Name: SCHEMA public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE USAGE ON SCHEMA public FROM PUBLIC;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
 -- Name: TABLE accounting; Type: ACL; Schema: public; Owner: postgres
 --
 
@@ -72371,24 +75402,17 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.accounting TO radiator;
 
 
 --
--- Name: TABLE hotspot_accounting_test; Type: ACL; Schema: public; Owner: postgres
+-- Name: TABLE allowed_nas_mac_address; Type: ACL; Schema: public; Owner: postgres
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.hotspot_accounting_test TO radiator;
-
-
---
--- Name: TABLE hotspot_test_services; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.hotspot_test_services TO radiator;
+GRANT SELECT ON TABLE public.allowed_nas_mac_address TO radiator;
 
 
 --
--- Name: TABLE hotspot_test_subcribers; Type: ACL; Schema: public; Owner: postgres
+-- Name: TABLE nas_session_mac_attrs; Type: ACL; Schema: public; Owner: postgres
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.hotspot_test_subcribers TO radiator;
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE public.nas_session_mac_attrs TO radiator;
 
 
 --
@@ -72409,7 +75433,7 @@ GRANT ALL ON SEQUENCE public.radacct_radacctid_seq TO radiator;
 -- Name: TABLE radauthlog; Type: ACL; Schema: public; Owner: postgres
 --
 
-GRANT ALL ON TABLE public.radauthlog TO radiator;
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE public.radauthlog TO radiator;
 
 
 --
@@ -72473,6 +75497,13 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.radsqlradiusindirect TO radiat
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.radstatslog TO radiator;
+
+
+--
+-- Name: TABLE sessions; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.sessions TO radiator;
 
 
 --
